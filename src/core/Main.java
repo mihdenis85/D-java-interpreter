@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        String source = "1.txt";
+        String source = "1.dlang";
         InputStream inputStream = new FileInputStream(source);
 
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(inputStream);
