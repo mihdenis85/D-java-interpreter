@@ -146,7 +146,6 @@ public class LexicalAnalyzer {
             }
         }
 
-        // For instance, `123.UnaryMinus()`
         if (builder.charAt(builder.length() - 1) == '.') {
             builder.deleteCharAt(builder.length() - 1);
             real = false;
