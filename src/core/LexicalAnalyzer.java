@@ -300,6 +300,7 @@ public class LexicalAnalyzer {
             case "string" -> Code.tkString;
             case "bool" -> Code.tkBoolean;
             case "empty" -> Code.tkEmpty;
+            case "." -> Code.tkDot;
             case "*" -> Code.tkMultiplySign;
             case "/" -> Code.tkDivideSign;
             case "+" -> Code.tkPlusSign;
