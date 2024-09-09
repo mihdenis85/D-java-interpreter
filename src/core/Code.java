@@ -46,6 +46,8 @@ public enum Code {
     tkClosedArrayBracket,
     tkOpenedTupleBracket,
     tkClosedTupleBracket,
+    tkOpenedBracket,
+    tkClosedBracket,
     tkArrowFunctionSign,
     tkIdentifier
 }

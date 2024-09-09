@@ -3,6 +3,7 @@ package src.core;
 import src.core.literals.BooleanLiteral;
 import src.core.literals.IntegerLiteral;
 import src.core.literals.RealLiteral;
+import src.core.literals.StringLiteral;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,15 +49,15 @@ public class LexicalAnalyzer {
     private Token nextToken() throws IOException {
         char symbol = (char) reader.read();
 
-        // Integer or Real Literal
         if (Character.isDigit(symbol))
             return expectNumber(symbol);
 
-        // Boolean Literal, Keyword or Identifier
         if (Character.isLetter(symbol) || symbol == '_')
             return expectWord(symbol);
 
-        // Punct
+        if (isQuotationMark(symbol))
+            return expectString(symbol);
+
         return expectPunct(symbol);
     }
 
@@ -157,9 +158,9 @@ public class LexicalAnalyzer {
         span.posEnd += word.length();
 
         if (real) {
-            return analyzeWord(word, span);
+            return startWordAnalysis(word, span);
         } else {
-            return analyzeWord(word, span);
+            return startWordAnalysis(word, span);
         }
     }
 
@@ -181,7 +182,7 @@ public class LexicalAnalyzer {
         String word = builder.toString();
         Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
         span.posEnd += word.length();
-        return analyzeWord(word, span);
+        return startWordAnalysis(word, span);
     }
 
     private Token expectPunct(char firstSymbol) throws IOException {
@@ -202,7 +203,32 @@ public class LexicalAnalyzer {
         String word = builder.toString();
         Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
         span.posEnd += word.length();
-        return analyzeWord(word, span);
+        return startWordAnalysis(word, span);
+    }
+
+    private Token expectString(char firstSymbol) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        builder.append(firstSymbol);
+
+        while (reader.ready()) {
+            reader.mark(1);
+            char c = (char) reader.read();
+            if (!isQuotationMark(c)) {
+                builder.append(c);
+            } else {
+                builder.append(c);
+                reader.mark(1);
+                //noinspection ReassignedVariable
+                c = (char) reader.read();
+                reader.reset();
+                break;
+            }
+        }
+
+        String word = builder.toString();
+        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
+        span.posEnd += word.length();
+        return startWordAnalysis(word, span);
     }
 
     private Token analyzeWord(String string, Span span) {
@@ -213,10 +239,30 @@ public class LexicalAnalyzer {
             token = new RealLiteral(span, string);
         } else if (isBoolean(string)) {
             token = new BooleanLiteral(span, string);
+        } else if (string.contains("'") || string.contains("\"")) {
+            token = new StringLiteral(span, string);
         } else {
             token = new Token(span, checkWord(string), string);
         }
         return token;
+    }
+
+    private Token startWordAnalysis(String string, Span span) {
+        boolean isPayload = false;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (c == ' ') {
+                if (isPayload)
+                    span.posBegin++;
+                else
+                    span.posEnd++;
+            } else {
+                builder.append(c);
+                isPayload = true;
+            }
+        }
+        return analyzeWord(builder.toString(), span);
     }
 
     private boolean isInteger(String wordFromInput) {
@@ -241,6 +287,10 @@ public class LexicalAnalyzer {
                     true;
             default -> false;
         };
+    }
+
+    private static boolean isQuotationMark(char symbol) {
+        return symbol == '\'' || symbol == '"';
     }
 
     private Code checkWord(String wordFromInput) {
@@ -286,6 +336,8 @@ public class LexicalAnalyzer {
             case "]" -> Code.tkClosedArrayBracket;
             case "{" -> Code.tkOpenedTupleBracket;
             case "}" -> Code.tkClosedTupleBracket;
+            case "(" -> Code.tkOpenedBracket;
+            case ")" -> Code.tkClosedBracket;
             case "=>" -> Code.tkArrowFunctionSign;
             default -> Code.tkIdentifier;
         };
