@@ -1,6 +1,7 @@
 package src.core;
 
 public enum Code {
+    tkLiteral,
     tkVar,
     tkInteger,
     tkReal,
@@ -40,9 +41,11 @@ public enum Code {
     tkColon,
     tkThen,
     tkIn,
+    tkDot,
     tkOpenedArrayBracket,
     tkClosedArrayBracket,
     tkOpenedTupleBracket,
     tkClosedTupleBracket,
     tkArrowFunctionSign,
+    tkIdentifier
 }
