@@ -31,7 +31,8 @@ public class LexicalAnalyzer {
     public void analyzeText() throws IOException {
         while (reader.ready()) {
             //noinspection StatementWithEmptyBody
-            while (skipComments() || skipWhitespaces()) {}
+            while (skipComments() || skipWhitespaces()) {
+            }
             if (!reader.ready())
                 break;
 
@@ -69,10 +70,26 @@ public class LexicalAnalyzer {
             char symbol = (char) reader.read();
 
             switch (symbol) {
-                case '\r' -> { globalSpan.posBegin = 1; globalSpan.posEnd = 0; skipped = true; }
-                case ' ', '\t' -> { globalSpan.posBegin++; globalSpan.posEnd = globalSpan.posBegin - 1; skipped = true; }
-                case '\n' -> { globalSpan.lineNum++; globalSpan.posBegin = 1; globalSpan.posEnd = 0; skipped = true; }
-                default -> { reader.reset(); return skipped; }
+                case '\r' -> {
+                    globalSpan.posBegin = 1;
+                    globalSpan.posEnd = 0;
+                    skipped = true;
+                }
+                case ' ', '\t' -> {
+                    globalSpan.posBegin++;
+                    globalSpan.posEnd = globalSpan.posBegin - 1;
+                    skipped = true;
+                }
+                case '\n' -> {
+                    globalSpan.lineNum++;
+                    globalSpan.posBegin = 1;
+                    globalSpan.posEnd = 0;
+                    skipped = true;
+                }
+                default -> {
+                    reader.reset();
+                    return skipped;
+                }
             }
         } while (reader.ready());
 
@@ -168,71 +185,27 @@ public class LexicalAnalyzer {
     }
 
     private Token expectPunct(char firstSymbol) throws IOException {
-        Punct.Type type = matchAhead(firstSymbol);
+        StringBuilder builder = new StringBuilder();
+        builder.append(firstSymbol);
 
-        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
-        span.posEnd += type.lexeme.length();
-
-        Code codeType = checkWord(type.lexeme);
-        return new Punct(type, span, codeType);
-    }
-
-    private Punct.Type matchAhead(char firstSymbol) throws IOException {
-        // Get all punct types
-        Punct.Type[] values = Punct.Type.values();
-
-        // Initialize the prefix match array.
-        // It stores the length of the matching prefix between
-        // current read symbols and corresponding punct lexeme
-        int[] prefixMatch = new int[values.length];
-        for (int i = 0; i < values.length; i++) {
-            prefixMatch[i] = (values[i].lexeme.isEmpty() || values[i].lexeme.charAt(0) != firstSymbol ? 0 : 1);
-        }
-
-        // Find the length of the longest possible punct lexeme
-        int maxLength = 1;
-        for (Punct.Type value : values) {
-            maxLength = Integer.max(maxLength, value.lexeme.length());
-        }
-
-        // Read symbols one by one and update prefix matches.
-        // If no update happened in the current iteration, stop iterating
-        reader.mark(maxLength - 1);
-        boolean updated = false;
-        for (int i = 1; reader.ready() && i < maxLength; i++, updated = false) {
+        while (reader.ready()) {
+            reader.mark(1);
             char c = (char) reader.read();
-
-            for (int j = 0; j < values.length; j++) {
-                if (prefixMatch[j] == i && values[j].lexeme.length() > i && values[j].lexeme.charAt(i) == c) {
-                    prefixMatch[j]++;
-                    updated = true;
-                }
-            }
-
-            if (!updated)
+            if (!isIdentifier(c) && isPunct(builder.toString())) {
+                builder.append(c);
+            } else {
+                reader.reset();
                 break;
-        }
-
-        // Find the longest partial and exact matches
-        int matchId = -1, exactMatchId = -1, maxMatch = 0, maxExactMatch = 0;
-        for (int i = 0; i < values.length; i++) {
-            if (prefixMatch[i] > maxMatch) {
-                maxMatch = prefixMatch[i];
-                matchId = i;
-
-                if (prefixMatch[i] == values[i].lexeme.length()) {
-                    maxExactMatch = prefixMatch[i];
-                    exactMatchId = i;
-                }
             }
         }
 
-        reader.reset();
-
-        return values[exactMatchId];
+        String word = builder.toString();
+        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
+        span.posEnd += word.length();
+        return analyzeWord(word, span);
     }
 
-    private Token analyzeWord(String string, Span span) throws IOException {
+    private Token analyzeWord(String string, Span span) {
         Token token;
         if (isInteger(string)) {
             token = new IntegerLiteral(span, string);
@@ -260,6 +233,14 @@ public class LexicalAnalyzer {
 
     private static boolean isIdentifier(char symbol) {
         return Character.isLetter(symbol) || Character.isDigit(symbol) || symbol == '_';
+    }
+
+    private static boolean isPunct(String wordFromInput) {
+        return switch (wordFromInput) {
+            case "*", ">", "/", "+", "-", "=", "<", "<=", ">=", "/=", ":=", ",", ";", ":", "[", "]", "{", "}", "=>" ->
+                    true;
+            default -> false;
+        };
     }
 
     private Code checkWord(String wordFromInput) {
