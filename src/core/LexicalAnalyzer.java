@@ -156,11 +156,7 @@ public class LexicalAnalyzer {
         Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
         span.posEnd += word.length();
 
-        if (real) {
-            return startWordAnalysis(word, span);
-        } else {
-            return startWordAnalysis(word, span);
-        }
+        return startWordAnalysis(word, span);
     }
 
     private Token expectWord(char firstSymbol) throws IOException {
