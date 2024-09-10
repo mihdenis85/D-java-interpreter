@@ -15,14 +15,19 @@ public class Main {
         ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
         for (int i = 0; i < tokens.size(); i++) {
             Token token = tokens.get(i);
-            System.out.println("Token:");
             System.out.println("Type: " + token.getType());
             System.out.println("Value: " + token.value);
             System.out.println("Id: " + i);
-            System.out.println("Line number: " + token.span.lineNum);
-            System.out.println("Position begin: " + token.span.posBegin);
-            System.out.println("Position end: " + token.span.posEnd);
+            System.out.print("Line number: " + token.span.lineNum + " ");
+            System.out.print("Position begin: " + token.span.posBegin + " ");
+            System.out.print("Position end: " + token.span.posEnd + " ");
+            System.out.println();
             System.out.println();
         }
+
+//        for (int i = 0; i < tokens.size(); i++) {
+//            Token token = tokens.get(i);
+//            System.out.println(token);
+//        }
     }
 }

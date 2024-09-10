@@ -306,7 +306,7 @@ public class LexicalAnalyzer {
             case "<=" -> Code.tkLessEqualSign;
             case ">" -> Code.tkGreaterSign;
             case ">=" -> Code.tkGreaterEqualSign;
-            case "/=" -> Code.tkDivideEqualSign;
+            case "/=" -> Code.tkNotEqualSign;
             case "not" -> Code.tkNot;
             case "or" -> Code.tkOr;
             case "and" -> Code.tkAnd;

@@ -19,7 +19,7 @@ public enum Code {
     tkLessEqualSign,
     tkGreaterSign,
     tkGreaterEqualSign,
-    tkDivideEqualSign,
+    tkNotEqualSign,
     tkNot,
     tkOr,
     tkAnd,
