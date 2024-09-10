@@ -102,14 +102,6 @@ public class LexicalAnalyzer {
 
         boolean skipped = false;
 
-        reader.mark(2);
-        char symbol1 = (char) reader.read();
-        char symbol2 = (char) reader.read();
-        reader.reset();
-        if (symbol1 == '/' && symbol2 == '=') {
-            return skipped;
-        }
-
         do {
             reader.mark(2);
             char symbol = (char) reader.read();
@@ -126,7 +118,7 @@ public class LexicalAnalyzer {
                 skipped = true;
             } else {
                 reader.reset();
-                System.exit(0);
+                return skipped;
             }
         } while (reader.ready());
 
