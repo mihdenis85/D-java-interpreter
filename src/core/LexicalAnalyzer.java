@@ -251,12 +251,12 @@ public class LexicalAnalyzer {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if (c == ' ') {
+            if (c == ' ' || c == '\n') {
                 if (isPayload)
                     span.posBegin++;
                 else
-                    span.posEnd++;
-            } else {
+                    span.posEnd--;
+            } else if (c != '\r') {
                 builder.append(c);
                 isPayload = true;
             }
