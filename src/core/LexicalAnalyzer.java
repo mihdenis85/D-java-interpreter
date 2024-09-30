@@ -187,9 +187,9 @@ public class LexicalAnalyzer {
         while (reader.ready()) {
             reader.mark(1);
             char c = (char) reader.read();
-            if (!isIdentifier(c) && isPunct(builder.toString())) {
-                builder.append(c);
-            } else {
+            builder.append(c);
+            if (isIdentifier(c) || !isPunct(builder.toString())) {
+                builder.deleteCharAt(builder.length() - 1);
                 reader.reset();
                 break;
             }
@@ -278,8 +278,8 @@ public class LexicalAnalyzer {
 
     private static boolean isPunct(String wordFromInput) {
         return switch (wordFromInput) {
-            case "*", ">", "/", "+", "-", "=", "<", "<=", ">=", "/=", ":=", ",", ";", ":", "[", "]", "{", "}", "=>" ->
-                    true;
+            case "*", ">", "/", "+", "-", "=", "<", "<=", ">=", "/=", ":=", ",", ";", ":", "[", "]", "{", "}", "=>",
+                 "(", ")" -> true;
             default -> false;
         };
     }

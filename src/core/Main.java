@@ -15,6 +15,13 @@ public class Main {
         ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
         for (int i = 0; i < tokens.size(); i++) {
             Token token = tokens.get(i);
+            System.out.print(token.value + " ");
+        }
+        System.out.println();
+        System.out.println();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens.get(i);
             System.out.println("Type: " + token.getType());
             System.out.println("Value: " + token.value);
             System.out.println("Id: " + i);
