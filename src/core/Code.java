@@ -1,7 +1,10 @@
 package src.core;
 
 public enum Code {
-    tkLiteral,
+    tkIntegerLiteral,
+    tkRealLiteral,
+    tkBooleanLiteral,
+    tkStringLiteral,
     tkVar,
     tkInteger,
     tkReal,
