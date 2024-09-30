@@ -1,12 +1,13 @@
 package src.core.literals;
 
+import src.core.Code;
 import src.core.Span;
 
 public class RealLiteral extends Literal {
     private final float realValue;
 
     public RealLiteral(Span span, String value) {
-        super(span, value);
+        super(span, Code.tkRealLiteral, value);
         this.realValue = Float.parseFloat(value);
     }
 

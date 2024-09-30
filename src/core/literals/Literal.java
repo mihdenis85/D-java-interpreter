@@ -5,7 +5,7 @@ import src.core.Span;
 import src.core.Token;
 
 public class Literal extends Token {
-    public Literal(Span span, String value) {
-        super(span, Code.tkLiteral, value);
+    public Literal(Span span, Code type, String value) {
+        super(span, type, value);
     }
 }
