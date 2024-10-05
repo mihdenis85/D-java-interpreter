@@ -1,11 +1,13 @@
 package src.core.syntax;
 
+import java.util.ArrayList;
+
 public class Operator {
     private final Keyword keyword;
     private final Identifier identifier;
-    private final Expression expressions;
+    private final ArrayList<Expression> expressions;
 
-    public Operator(Keyword keyword, Identifier identifier, Expression expressions) {
+    public Operator(Keyword keyword, Identifier identifier, ArrayList<Expression> expressions) {
         this.keyword = keyword;
         this.identifier = identifier;
         this.expressions = expressions;
@@ -19,7 +21,7 @@ public class Operator {
         return identifier;
     }
 
-    public Expression getExpressions() {
+    public ArrayList<Expression> getExpressions() {
         return expressions;
     }
 }
