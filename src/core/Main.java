@@ -1,8 +1,13 @@
 package src.core;
 
+import src.core.syntax.Operator;
+import src.core.syntax.Program;
+import src.core.syntax.Variable;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Main {
@@ -15,7 +20,13 @@ public class Main {
         ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
         SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
 
-        syntaxAnalyzer.analyzeProgram();
+        Program program = syntaxAnalyzer.buildProgram();
+        ArrayList<Variable> variables = (ArrayList<Variable>) program.getProgram().get(0);
+        ArrayList<Operator> operators = (ArrayList<Operator>) program.getProgram().get(1);
+
+        for (Variable variable : variables) {
+            System.out.println(variable.outputConsole());
+        }
 
 //        for (int i = 0; i < tokens.size(); i++) {
 //            Token token = tokens.get(i);
