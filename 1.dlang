@@ -1,1 +1,1 @@
-print sumNestedTuples(nestedTuple);  // Should print 10
+var sum := 0;
