@@ -2,8 +2,9 @@ package src.core.literals;
 
 import src.core.Code;
 import src.core.Span;
+import src.core.syntax.ExpressionElement;
 
-public class RealLiteral extends Literal {
+public class RealLiteral extends Literal implements ExpressionElement {
     private final float realValue;
 
     public RealLiteral(Span span, String value) {

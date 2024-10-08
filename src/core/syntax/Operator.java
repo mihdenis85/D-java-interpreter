@@ -2,7 +2,7 @@ package src.core.syntax;
 
 import java.util.ArrayList;
 
-public class Operator {
+public class Operator implements ExpressionElement{
     private final Keyword keyword;
     private final Identifier identifier;
     private final ArrayList<Expression> expressions;

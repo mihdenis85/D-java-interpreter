@@ -1,16 +1,15 @@
 package src.core.syntax;
 
-import java.util.ArrayList;
-
-public class Expression {
+public class Expression implements ExpressionElement{
     // TODO: Should be not an ArrayList instead should be one of Literals/Punctuation/Operator
-    public final ArrayList<?> expressions;
 
-    public Expression(ArrayList<?> expressions) {
+    public final ExpressionElement expressions;
+
+    public Expression(ExpressionElement expressions) {
         this.expressions = expressions;
     }
 
-    public ArrayList<?> getExpressions() {
+    public ExpressionElement getExpressions() {
         return expressions;
     }
 }
