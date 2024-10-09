@@ -1,4 +1,4 @@
-package src.core.syntax;
+package src.core.syntax.interfaces;
 
 public interface ExpressionElement {
 

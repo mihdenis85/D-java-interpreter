@@ -1,8 +1,8 @@
 package src.core.literals;
 
-import src.core.Code;
+import src.core.enums.Code;
 import src.core.Span;
-import src.core.syntax.ExpressionElement;
+import src.core.syntax.interfaces.ExpressionElement;
 
 public class BooleanLiteral extends Literal implements ExpressionElement {
     private final boolean booleanValue;

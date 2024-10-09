@@ -1,17 +1,17 @@
 package src.core.syntax;
 
+import src.core.syntax.interfaces.SyntaxElement;
+
 import java.util.ArrayList;
 
 public class Program {
-    private final ArrayList<ArrayList<?>> program;
+    private final ArrayList<SyntaxElement> program;
 
-    public Program(ArrayList<Variable> variableDeclaration, ArrayList<Operator> operatorDeclaration) {
-        this.program = new ArrayList<>();
-        this.program.add(variableDeclaration);
-        this.program.add(operatorDeclaration);
+    public Program(ArrayList<SyntaxElement> variables) {
+        this.program = variables;
     }
 
-    public ArrayList<ArrayList<?>> getProgram() {
+    public ArrayList<SyntaxElement> getProgram() {
         return program;
     }
 }

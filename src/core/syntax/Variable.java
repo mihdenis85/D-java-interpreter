@@ -1,8 +1,8 @@
 package src.core.syntax;
 
-import java.util.ArrayList;
+import src.core.syntax.interfaces.SyntaxElement;
 
-public class Variable {
+public class Variable implements SyntaxElement {
     private final Keyword keyword;
     private final Identifier identifier;
 
