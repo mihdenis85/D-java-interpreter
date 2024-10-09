@@ -1,8 +1,11 @@
 package src.core.syntax;
 
+import src.core.syntax.interfaces.ExpressionElement;
+import src.core.syntax.interfaces.SyntaxElement;
+
 import java.util.ArrayList;
 
-public class Operator implements ExpressionElement{
+public class Operator implements ExpressionElement, SyntaxElement {
     private final Keyword keyword;
     private final Identifier identifier;
     private final ArrayList<Expression> expressions;

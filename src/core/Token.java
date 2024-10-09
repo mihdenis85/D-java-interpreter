@@ -1,5 +1,7 @@
 package src.core;
 
+import src.core.enums.Code;
+
 public class Token {
     public Span span;
     public Code type;

@@ -3,6 +3,7 @@ package src.core;
 import src.core.syntax.Operator;
 import src.core.syntax.Program;
 import src.core.syntax.Variable;
+import src.core.syntax.interfaces.SyntaxElement;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,11 +22,10 @@ public class Main {
         SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
 
         Program program = syntaxAnalyzer.buildProgram();
-        ArrayList<Variable> variables = (ArrayList<Variable>) program.getProgram().get(0);
-        ArrayList<Operator> operators = (ArrayList<Operator>) program.getProgram().get(1);
+        ArrayList<SyntaxElement> variables = program.getProgram();
 
-        for (Variable variable : variables) {
-            System.out.println(variable.outputConsole());
+        for (SyntaxElement syntaxElement : variables) {
+            System.out.println(syntaxElement);
         }
 
 //        for (int i = 0; i < tokens.size(); i++) {

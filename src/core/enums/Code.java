@@ -1,4 +1,4 @@
-package src.core;
+package src.core.enums;
 
 public enum Code {
     tkIntegerLiteral,

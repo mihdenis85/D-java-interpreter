@@ -1,5 +1,6 @@
 package src.core;
 
+import src.core.enums.Code;
 import src.core.literals.BooleanLiteral;
 import src.core.literals.IntegerLiteral;
 import src.core.literals.RealLiteral;
