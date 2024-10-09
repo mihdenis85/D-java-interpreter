@@ -7,7 +7,7 @@ import src.core.syntax.ExpressionElement;
 
 import java.util.ArrayList;
 
-public class ArrayLiteral extends Token implements ExpressionElement {
+public class ArrayLiteral extends Literal implements ExpressionElement {
     private final ArrayList<ExpressionElement> elements;
 
     public ArrayLiteral(Span span, Code type, String value, ArrayList<ExpressionElement> elements) {
