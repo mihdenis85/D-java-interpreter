@@ -1,15 +1,22 @@
 package src.core;
 
+import src.core.enums.Punct;
 import src.core.exceptions.InvalidIdentifierNameException;
+import src.core.exceptions.TokenOutOfIndexException;
 import src.core.exceptions.UnexpectedTokenException;
 import src.core.literals.BooleanLiteral;
+import src.core.literals.IntegerLiteral;
+import src.core.literals.RealLiteral;
 import src.core.syntax.*;
 import src.core.enums.Code;
+import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.IfStatement;
+import src.core.syntax.statements.WhileLoop;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.*;
 
 public class SyntaxAnalyzer {
@@ -29,6 +36,38 @@ public class SyntaxAnalyzer {
         return null;
     }
 
+    private void skipToken() {
+        currentTokenIndex++;
+    }
+
+    private Token peekToken(int ahead) throws TokenOutOfIndexException {
+        if (currentTokenIndex + ahead < tokensList.size())
+            return tokensList.get(currentTokenIndex + ahead);
+        throw new TokenOutOfIndexException("Could not parse the token");
+    }
+
+    private void matchPunct(Code code) throws UnexpectedTokenException {
+        Token nextToken = getNextToken();
+        if (!(Punct.contains(nextToken.type) && code != null)) {
+            throw new UnexpectedTokenException(nextToken.span, nextToken.type, code);
+        }
+    }
+
+    private Code getIdentifierOnMatch() throws UnexpectedTokenException {
+        Token nextToken = getNextToken();
+        if (nextToken.type == Code.tkIdentifier) {
+            return Code.tkIdentifier;
+        } else {
+            throw new UnexpectedTokenException(nextToken.span, nextToken.type, null);
+        }
+    }
+
+    private boolean expectPunct(Code code, int ahead) throws TokenOutOfIndexException {
+        return currentTokenIndex + ahead < tokensList.size()
+                && Punct.contains(peekToken(ahead).type)
+                && code != null;
+    }
+
     public Program buildProgram() {
         ArrayList<SyntaxElement> syntaxElements = new ArrayList<>();
 
@@ -43,6 +82,8 @@ public class SyntaxAnalyzer {
                     case tkIfStatement:
                         syntaxElements.add(analyzeIfStatementDeclaration(token));
                         break;
+                    case tkWhileLoop:
+                        syntaxElements.add(analyzeWhileLoopDeclaration(token));
                     default:
                         throw new Exception("Error");
                 };
@@ -52,6 +93,26 @@ public class SyntaxAnalyzer {
         }
 
         return new Program(syntaxElements);
+    }
+
+    public WhileLoop analyzeWhileLoopDeclaration(Token token) {
+        try {
+            Expression expression = new Expression(new BooleanLiteral(token.span, token.value)); // TODO: Add method for parsing condition
+            currentTokenIndex++;
+
+            expectKeyword(Code.tkLoop);
+            System.out.println("Analyzing body"); // TODO: Add method for parsing body
+
+            ArrayList<StatementElement> statementBody = new ArrayList<>();
+            currentTokenIndex++;
+
+            expectKeyword(Code.tkEnd);
+            return new WhileLoop(expression, statementBody);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+        return null;
     }
 
     public IfStatement analyzeIfStatementDeclaration(Token token) {
@@ -84,8 +145,78 @@ public class SyntaxAnalyzer {
         return null;
     }
 
-    public void expectExpression() {
-        // TODO: Complete method
+    public Expression parseExpression() throws UnexpectedTokenException, TokenOutOfIndexException {
+        ExpressionElement expression = parseExpressionElement();
+
+        List<Expression> chain = new ArrayList<>();
+        while (expectPunct(Code.tkDot, 0)) {
+            skipToken();
+
+            Code id = getIdentifierOnMatch();
+
+            List<ExpressionElement> arguments = null;
+            if (expectPunct(Code.tkOpenedBracket, 0)) {
+                skipToken();
+
+                arguments = new ArrayList<>();
+                if (!expectPunct(Code.tkClosedBracket, 0)) {
+                    arguments = parseArguments();
+                }
+
+                matchPunct(Code.tkClosedBracket);
+            }
+
+            chain.add(new Expression((src.core.syntax.interfaces.ExpressionElement) arguments));
+            // TODO: Implement normal arguments parsing
+        }
+
+        return new Expression(expression);
+    }
+
+    public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
+        Token peek = peekToken(0);
+        return switch (peek) {
+            case IntegerLiteral il -> { skipToken(); yield il; }
+            case RealLiteral rl -> { skipToken(); yield rl; }
+            case BooleanLiteral bl -> { skipToken(); yield bl; }
+            /*case Identifier id -> {
+                if (expectPunct(Code.tkOpenedArrayBracket, 1) || expectPunct(Code.tkOpenedBracket, 1)) {
+                     //ClassName className = parseClassName();
+
+                    if (expectPunct(Code.tkOpenedBracket, 0)) {
+                        skipToken();
+
+                        List<Expression> arguments = parseArguments();
+
+                        matchPunct(Code.tkClosedBracket);
+
+                        yield new ConstructorCall(className, arguments);
+                    } else {
+                        yield className;
+                    }
+                } else {
+                    skipToken();
+                    yield id;
+                }
+            }*/
+            default -> throw new UnexpectedTokenException(peek.span, peek.getType(), null);
+        };
+    }
+
+    private List<ExpressionElement> parseArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+        List<ExpressionElement> arguments = new ArrayList<>();
+
+        if (!expectPunct(Code.tkClosedBracket, 0)) {
+            arguments.add(parseExpression());
+
+            while (expectPunct(Code.tkComma, 0)) {
+                skipToken();
+
+                arguments.add(parseExpression());
+            }
+        }
+
+        return arguments;
     }
 
     public boolean expectKeyword(Code tokenType) throws UnexpectedTokenException {
