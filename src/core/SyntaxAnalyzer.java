@@ -2,16 +2,19 @@ package src.core;
 
 import src.core.enums.Punct;
 import src.core.exceptions.InvalidIdentifierNameException;
+import src.core.exceptions.InvalidSyntaxException;
 import src.core.exceptions.TokenOutOfIndexException;
 import src.core.exceptions.UnexpectedTokenException;
 import src.core.literals.BooleanLiteral;
 import src.core.literals.IntegerLiteral;
 import src.core.literals.RealLiteral;
+import src.core.literals.StringLiteral;
 import src.core.syntax.*;
 import src.core.enums.Code;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
+import src.core.syntax.statements.ForLoop;
 import src.core.syntax.statements.IfStatement;
 import src.core.syntax.statements.WhileLoop;
 
@@ -84,6 +87,8 @@ public class SyntaxAnalyzer {
                         break;
                     case tkWhileLoop:
                         syntaxElements.add(analyzeWhileLoopDeclaration(token));
+                    case tkForLoop:
+                        syntaxElements.add(analyzeForLoopDeclaration(token));
                     default:
                         throw new Exception("Error");
                 };
@@ -93,6 +98,57 @@ public class SyntaxAnalyzer {
         }
 
         return new Program(syntaxElements);
+    }
+
+    private SyntaxElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
+        Token peek = peekToken(0);
+        return switch (peek.type) {
+            case Code.tkIfStatement -> analyzeIfStatementDeclaration(peek);
+            case Code.tkReturn -> analyzeReturnStatement();
+            case Code.tkWhileLoop -> analyzeWhileLoopDeclaration(peek);
+            case Code.tkVar -> analyzeVariableDeclaration(peek);
+            case Code.tkIdentifier -> analyzeIdentifierStatement(peek);
+            default -> throw new InvalidSyntaxException("Expected `"
+                    + Code.tkIfStatement.name() + "`, `"
+                    + Code.tkReturn.name() + "`, `"
+                    + Code.tkWhileLoop.name() + "`, `"
+                    + Code.tkVar.name() + "` or `"
+                    + "`, but got `" + peek + "` instead"
+                    + "\n\tat line " + peek.span.lineNum + " column " + peek.span.posBegin);
+        };
+    }
+
+    private SyntaxElement analyzeIdentifierStatement(Token peek) {
+        return null;
+    }
+
+    private SyntaxElement parseAssignment() {
+        return null;
+    }
+
+    private StatementElement analyzeReturnStatement() {
+        return null;
+    }
+
+    private SyntaxElement analyzeForLoopDeclaration(Token token) {
+        try {
+            Identifier ident = expectIdentifier();
+
+            expectKeyword(Code.tkIn);
+            Expression expression = parseExpression();
+
+            expectKeyword(Code.tkLoop);
+            ArrayList<SyntaxElement> loopBody = parseBody();
+            currentTokenIndex++;
+
+            expectKeyword(Code.tkEnd);
+
+            return new ForLoop(ident, expression, loopBody);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+        return null;
     }
 
     public WhileLoop analyzeWhileLoopDeclaration(Token token) {
@@ -173,36 +229,17 @@ public class SyntaxAnalyzer {
         return new Expression(expression);
     }
 
+
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
         return switch (peek) {
             case IntegerLiteral il -> { skipToken(); yield il; }
             case RealLiteral rl -> { skipToken(); yield rl; }
             case BooleanLiteral bl -> { skipToken(); yield bl; }
-            /*case Identifier id -> {
-                if (expectPunct(Code.tkOpenedArrayBracket, 1) || expectPunct(Code.tkOpenedBracket, 1)) {
-                     //ClassName className = parseClassName();
-
-                    if (expectPunct(Code.tkOpenedBracket, 0)) {
-                        skipToken();
-
-                        List<Expression> arguments = parseArguments();
-
-                        matchPunct(Code.tkClosedBracket);
-
-                        yield new ConstructorCall(className, arguments);
-                    } else {
-                        yield className;
-                    }
-                } else {
-                    skipToken();
-                    yield id;
-                }
-            }*/
+            case StringLiteral sl -> { skipToken(); yield sl; }
             default -> throw new UnexpectedTokenException(peek.span, peek.getType(), null);
         };
     }
-
     private List<ExpressionElement> parseArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         List<ExpressionElement> arguments = new ArrayList<>();
 
@@ -217,6 +254,16 @@ public class SyntaxAnalyzer {
         }
 
         return arguments;
+    }
+
+    private ArrayList<SyntaxElement> parseBody() throws UnexpectedTokenException, TokenOutOfIndexException {
+        ArrayList<SyntaxElement> body = new ArrayList<>();
+
+        while (!expectKeyword(Code.tkEnd) && !expectKeyword(Code.tkElse)) {
+            body.add(parseStatement());
+        }
+
+        return body;
     }
 
     public boolean expectKeyword(Code tokenType) throws UnexpectedTokenException {
