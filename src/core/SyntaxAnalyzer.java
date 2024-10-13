@@ -92,22 +92,7 @@ public class SyntaxAnalyzer {
 
         try {
             while (currentTokenIndex < tokensList.size()) {
-                Token token = getNextToken();
-                System.out.println(token.type);
-                switch (token.type) {
-                    case tkVar:
-                        syntaxElements.add(analyzeVariableDeclaration(token));
-                        break;
-                    case tkIfStatement:
-                        syntaxElements.add(analyzeIfStatementDeclaration(token));
-                        break;
-                    case tkWhileLoop:
-                        syntaxElements.add(analyzeWhileLoopDeclaration(token));
-                    case tkForLoop:
-                        syntaxElements.add(analyzeForLoopDeclaration(token));
-                    default:
-                        throw new Exception("Error");
-                };
+                syntaxElements.add(parseStatement());
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -144,7 +129,7 @@ public class SyntaxAnalyzer {
         matchKeyword(Code.tkReturn);
 
         Expression returnValue = null;
-        if (hasNextToken() && !expectKeyword(Code.tkEnd) && !expectKeyword(Code.tkElse)) {
+        if (hasNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
             returnValue = parseExpression();
         }
 
@@ -155,15 +140,17 @@ public class SyntaxAnalyzer {
         try {
             Identifier ident = expectIdentifier();
 
-            expectKeyword(Code.tkIn);
+            expectKeyword(Code.tkIn, 0);
             Expression expression = parseExpression();
-            currentTokenIndex++;
 
-            expectKeyword(Code.tkLoop);
+            skipToken();
+
+            expectKeyword(Code.tkLoop, 0);
             ArrayList<StatementElement> loopBody = parseBody();
-            currentTokenIndex++;
 
-            expectKeyword(Code.tkEnd);
+            skipToken();
+
+            expectKeyword(Code.tkEnd, 0);
 
             return new ForLoop(ident, expression, loopBody);
         } catch (Exception e) {
@@ -175,15 +162,19 @@ public class SyntaxAnalyzer {
 
     public WhileLoop analyzeWhileLoopDeclaration(Token token) {
         try {
-            Expression expression = parseExpression();
-            currentTokenIndex++;
+            expectKeyword(Code.tkWhileLoop, 0);
 
-            expectKeyword(Code.tkLoop);
+            Expression expression = parseExpression();
+
+            skipToken();
+
+            expectKeyword(Code.tkLoop, 0);
 
             ArrayList<StatementElement> statementBody = parseBody();
-            currentTokenIndex++;
 
-            expectKeyword(Code.tkEnd);
+            skipToken();
+
+            expectKeyword(Code.tkEnd, 0);
             return new WhileLoop(expression, statementBody);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -193,20 +184,24 @@ public class SyntaxAnalyzer {
     }
 
     public IfStatement analyzeIfStatementDeclaration(Token token) {
-        // TODO: Remove currentTokenIndex, add it in functions
-
         try {
-            Expression expression = parseExpression();
-            currentTokenIndex++;
+            expectKeyword(Code.tkIfStatement, 0);
 
-            expectKeyword(Code.tkThen);
+            Expression expression = parseExpression();
+
+            skipToken();
+
+            expectKeyword(Code.tkThen, 0);
+
             ArrayList<StatementElement> statementBody = parseBody();
-            currentTokenIndex++;
+
+            skipToken();
 
             ArrayList<StatementElement> elseStatementBody = parseBody();
-            currentTokenIndex++;
 
-            expectKeyword(Code.tkEnd);
+            skipToken();
+
+            expectKeyword(Code.tkEnd, 0);
 
             return new IfStatement(expression, statementBody, elseStatementBody);
         } catch (Exception e) {
@@ -275,27 +270,34 @@ public class SyntaxAnalyzer {
     private ArrayList<StatementElement> parseBody() throws UnexpectedTokenException, TokenOutOfIndexException {
         ArrayList<StatementElement> body = new ArrayList<>();
 
-        while (!expectKeyword(Code.tkEnd) && !expectKeyword(Code.tkElse)) {
+        while (!expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
             body.add(parseStatement());
         }
 
         return body;
     }
 
-    public boolean expectKeyword(Code tokenType) throws UnexpectedTokenException {
-        Token token = getNextToken();
-        if (token.type != tokenType) {
-            throw new UnexpectedTokenException(token.span, token.type, tokenType);
+    public boolean expectKeyword(Code tokenType, int ahead) throws TokenOutOfIndexException {
+        if (currentTokenIndex + ahead < tokensList.size()) {
+            Token token = peekToken(ahead);
+            return token.type == tokenType;
         }
 
-        return true;
+        return false;
     }
 
     public Variable analyzeVariableDeclaration(Token token) {
-        System.out.println("Analyzing variable declaration");
         try {
+            matchKeyword(Code.tkVar);
+
             Keyword keyword = new Keyword(token.value, token.span);
             Identifier identifier = expectIdentifier();
+
+            if (expectKeyword(Code.tkAssignment, 0)) {
+                parseExpression();
+            }
+
+            matchPunct(Code.tkSemicolon);
 
             return new Variable(keyword, identifier);
         } catch (Exception e) {
@@ -310,8 +312,9 @@ public class SyntaxAnalyzer {
         Token token = getNextToken();
 
         boolean isValid = Pattern.matches("^[a-zA-Z$_][a-zA-Z0-9$_]*$", token.value);
+        boolean isKeyword = Keywords.contains(token.type);
 
-        if (!isValid) {
+        if (!isValid || isKeyword) {
             throw new InvalidIdentifierNameException(token.span);
         }
 
