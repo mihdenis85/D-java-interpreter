@@ -1,8 +1,8 @@
 package src.core.syntax;
 
-import src.core.syntax.interfaces.SyntaxElement;
+import src.core.syntax.interfaces.StatementElement;
 
-public class Variable implements SyntaxElement {
+public class Variable implements StatementElement {
     private final Keyword keyword;
     private final Identifier identifier;
 

@@ -1,5 +1,6 @@
 package src.core;
 
+import src.core.enums.Keywords;
 import src.core.enums.Punct;
 import src.core.exceptions.InvalidIdentifierNameException;
 import src.core.exceptions.InvalidSyntaxException;
@@ -16,8 +17,10 @@ import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.ForLoop;
 import src.core.syntax.statements.IfStatement;
+import src.core.syntax.statements.ReturnStatement;
 import src.core.syntax.statements.WhileLoop;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.*;
@@ -39,6 +42,10 @@ public class SyntaxAnalyzer {
         return null;
     }
 
+    public boolean hasNextToken() {
+        return currentTokenIndex < tokensList.size();
+    }
+
     private void skipToken() {
         currentTokenIndex++;
     }
@@ -53,6 +60,15 @@ public class SyntaxAnalyzer {
         Token nextToken = getNextToken();
         if (!(Punct.contains(nextToken.type) && code != null)) {
             throw new UnexpectedTokenException(nextToken.span, nextToken.type, code);
+        }
+    }
+
+    private void matchKeyword(Code code) {
+        Token nextToken = getNextToken();
+        if (!(Keywords.contains(nextToken.type) && code != null)) {
+            throw new InvalidSyntaxException("Expected keyword `" + code.name()
+                    + "`, but got `" + nextToken + "` instead"
+                    + "\n\tat line " + nextToken.span.lineNum + " column " + nextToken.span.posBegin);
         }
     }
 
@@ -100,7 +116,7 @@ public class SyntaxAnalyzer {
         return new Program(syntaxElements);
     }
 
-    private SyntaxElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
+    private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
         return switch (peek.type) {
             case Code.tkIfStatement -> analyzeIfStatementDeclaration(peek);
@@ -118,16 +134,21 @@ public class SyntaxAnalyzer {
         };
     }
 
-    private SyntaxElement analyzeIdentifierStatement(Token peek) {
+    private StatementElement analyzeIdentifierStatement(Token peek) {
         return null;
     }
 
-    private SyntaxElement parseAssignment() {
-        return null;
-    }
+    private StatementElement analyzeReturnStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
+        Span span = peekToken(0).span;
 
-    private StatementElement analyzeReturnStatement() {
-        return null;
+        matchKeyword(Code.tkReturn);
+
+        Expression returnValue = null;
+        if (hasNextToken() && !expectKeyword(Code.tkEnd) && !expectKeyword(Code.tkElse)) {
+            returnValue = parseExpression();
+        }
+
+        return new ReturnStatement(returnValue, span);
     }
 
     private SyntaxElement analyzeForLoopDeclaration(Token token) {
@@ -136,9 +157,10 @@ public class SyntaxAnalyzer {
 
             expectKeyword(Code.tkIn);
             Expression expression = parseExpression();
+            currentTokenIndex++;
 
             expectKeyword(Code.tkLoop);
-            ArrayList<SyntaxElement> loopBody = parseBody();
+            ArrayList<StatementElement> loopBody = parseBody();
             currentTokenIndex++;
 
             expectKeyword(Code.tkEnd);
@@ -153,13 +175,12 @@ public class SyntaxAnalyzer {
 
     public WhileLoop analyzeWhileLoopDeclaration(Token token) {
         try {
-            Expression expression = new Expression(new BooleanLiteral(token.span, token.value)); // TODO: Add method for parsing condition
+            Expression expression = parseExpression();
             currentTokenIndex++;
 
             expectKeyword(Code.tkLoop);
-            System.out.println("Analyzing body"); // TODO: Add method for parsing body
 
-            ArrayList<StatementElement> statementBody = new ArrayList<>();
+            ArrayList<StatementElement> statementBody = parseBody();
             currentTokenIndex++;
 
             expectKeyword(Code.tkEnd);
@@ -175,20 +196,15 @@ public class SyntaxAnalyzer {
         // TODO: Remove currentTokenIndex, add it in functions
 
         try {
-            Expression expression = new Expression(new BooleanLiteral(token.span, token.value)); // TODO: Add method for parsing condition
+            Expression expression = parseExpression();
             currentTokenIndex++;
 
             expectKeyword(Code.tkThen);
-            System.out.println("Analyzing body"); // TODO: Add method for parsing body
-
-            ArrayList<StatementElement> statementBody = new ArrayList<>();
+            ArrayList<StatementElement> statementBody = parseBody();
             currentTokenIndex++;
 
-            ArrayList<StatementElement> elseStatementBody = new ArrayList<>();
-            if (expectKeyword(Code.tkElse)) {
-                System.out.println("Analyzing else body"); // TODO: Add method for parsing body
-                currentTokenIndex++;
-            };
+            ArrayList<StatementElement> elseStatementBody = parseBody();
+            currentTokenIndex++;
 
             expectKeyword(Code.tkEnd);
 
@@ -256,8 +272,8 @@ public class SyntaxAnalyzer {
         return arguments;
     }
 
-    private ArrayList<SyntaxElement> parseBody() throws UnexpectedTokenException, TokenOutOfIndexException {
-        ArrayList<SyntaxElement> body = new ArrayList<>();
+    private ArrayList<StatementElement> parseBody() throws UnexpectedTokenException, TokenOutOfIndexException {
+        ArrayList<StatementElement> body = new ArrayList<>();
 
         while (!expectKeyword(Code.tkEnd) && !expectKeyword(Code.tkElse)) {
             body.add(parseStatement());

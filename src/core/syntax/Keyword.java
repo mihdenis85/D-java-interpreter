@@ -1,6 +1,7 @@
 package src.core.syntax;
 
 import src.core.Span;
+import src.core.Token;
 
 public class Keyword {
     private final String value;
@@ -11,6 +12,7 @@ public class Keyword {
         this.span = span;
         this.value = value;
     }
+
 
     public String getValue() {
         return value;
