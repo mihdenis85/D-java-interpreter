@@ -6,6 +6,9 @@ import src.core.exceptions.InvalidIdentifierNameException;
 import src.core.exceptions.InvalidSyntaxException;
 import src.core.exceptions.TokenOutOfIndexException;
 import src.core.exceptions.UnexpectedTokenException;
+import src.core.expressionElements.UnaryMinus;
+import src.core.expressionElements.UnaryNot;
+import src.core.expressionElements.UnaryPlus;
 import src.core.literals.BooleanLiteral;
 import src.core.literals.IntegerLiteral;
 import src.core.literals.RealLiteral;
@@ -107,6 +110,7 @@ public class SyntaxAnalyzer {
         return switch (peek.type) {
             case Code.tkIfStatement -> analyzeIfStatementDeclaration();
             case Code.tkReturn -> analyzeReturnStatement();
+//            case Code.tkForLoop -> analyzeForLoopDeclaration();
             case Code.tkWhileLoop -> analyzeWhileLoopDeclaration();
             case Code.tkVar -> analyzeDeclarationStatement(peek);
             case Code.tkIdentifier -> analyzeAssignmentStatement();
@@ -174,16 +178,20 @@ public class SyntaxAnalyzer {
         return new ReturnStatement(returnValue, token.span);
     }
 
-    private SyntaxElement analyzeForLoopDeclaration(Token token) {
+    private SyntaxElement analyzeForLoopDeclaration() {
         try {
+            matchKeyword(Code.tkForLoop);
+
             Identifier ident = expectIdentifier();
 
-            expectKeyword(Code.tkIn, 0);
+            matchKeyword(Code.tkIn);
+
             Expression expression = parseExpression();
 
             skipToken();
 
             expectKeyword(Code.tkLoop, 0);
+
             ArrayList<StatementElement> loopBody = parseBody();
 
             skipToken();
@@ -195,24 +203,22 @@ public class SyntaxAnalyzer {
             System.out.println(e.getMessage());
             System.exit(0);
         }
+
         return null;
     }
 
     public WhileLoop analyzeWhileLoopDeclaration() {
         try {
-            expectKeyword(Code.tkWhileLoop, 0);
+            matchKeyword(Code.tkWhileLoop);
 
             Expression expression = parseExpression();
 
-            skipToken();
-
-            expectKeyword(Code.tkLoop, 0);
+            matchKeyword(Code.tkLoop);
 
             ArrayList<StatementElement> statementBody = parseBody();
 
-            skipToken();
-
-            expectKeyword(Code.tkEnd, 0);
+            matchKeyword(Code.tkEnd);
+            matchPunct(Code.tkSemicolon);
             return new WhileLoop(expression, statementBody);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -229,19 +235,12 @@ public class SyntaxAnalyzer {
 
             matchKeyword(Code.tkThen);
 
-//            ArrayList<StatementElement> statementBody = parseBody();
-            ArrayList<StatementElement> statementBody = new ArrayList<>();
-
-            skipToken();
-            skipToken();
-            skipToken();
+            ArrayList<StatementElement> statementBody = parseBody();
 
             ArrayList<StatementElement> elseStatementBody = new ArrayList<>();
             if (expectKeyword(Code.tkElse, 0)) {
-//            ArrayList<StatementElement> elseStatementBody = parseBody();
-                skipToken();
+                elseStatementBody = parseBody();
             }
-
 
             matchKeyword(Code.tkEnd);
             matchPunct(Code.tkSemicolon);
@@ -261,14 +260,14 @@ public class SyntaxAnalyzer {
 
     public Expression parseExpression() throws UnexpectedTokenException, TokenOutOfIndexException {
         Token token = peekToken(0);
+        ArrayList<ExpressionElement> expressions = new ArrayList<>();
 
         if (expectUnaryOperator(token)) {
-            ExpressionElement unaryExpression = parseExpressionElement();
+            expressions.add(parseExpressionElement());
         }
 
-        ExpressionElement expression = parseExpressionElement();
+        expressions.add(parseExpressionElement());
 
-//        ArrayList<Expression> chain = new ArrayList<>();
 //        while (expectPunct(Code.tkDot, 0)) {
 //            skipToken();
 //
@@ -289,7 +288,7 @@ public class SyntaxAnalyzer {
 //            chain.add(new Expression((src.core.syntax.interfaces.ExpressionElement) arguments));
 //        }
 
-        return new Expression(expression);
+        return new Expression(expressions);
     }
 
 
@@ -303,9 +302,9 @@ public class SyntaxAnalyzer {
                 case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
                 case Code.tkBooleanLiteral -> new BooleanLiteral(token.span, token.value);
                 case Code.tkIdentifier -> new Identifier(token.value, token.span);
-//                case Code.tkPlusSign -> new UnaryPlus(token.span, token.value);
-//                case Code.tkMinusSign -> new UnaryMinus(token.span, token.value);
-//                case Code.tkNewline -> new Not(token.span, token.value);
+                case Code.tkPlusSign -> new UnaryPlus(token.value, token.span);
+                case Code.tkMinusSign -> new UnaryMinus(token.value, token.span);
+                case Code.tkNewline -> new UnaryNot(token.value, token.span);
                 default -> throw new UnexpectedTokenException(token.span, token.type, null);
             };
         } catch (Exception e) {

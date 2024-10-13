@@ -2,15 +2,17 @@ package src.core.syntax;
 
 import src.core.syntax.interfaces.ExpressionElement;
 
+import java.util.ArrayList;
+
 public class Expression implements ExpressionElement {
 
-    public final ExpressionElement expression;
+    public final ArrayList<ExpressionElement> expressions;
 
-    public Expression(ExpressionElement expression) {
-        this.expression = expression;
+    public Expression(ArrayList<ExpressionElement> expressions) {
+        this.expressions = expressions;
     }
 
-    public ExpressionElement getExpression() {
-        return expression;
+    public ArrayList<ExpressionElement> getExpressions() {
+        return expressions;
     }
 }

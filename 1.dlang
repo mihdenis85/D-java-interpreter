@@ -4,10 +4,16 @@
 
 // result := integerVar1 + integerVar2;
 
-return integerVar2;
+//return +integerVar2;
 
 //if true then
   // return 1;
 //end;
 
-// return 1;
+//return 1;
+
+while true loop
+    if false then
+        return 2;
+    end;
+end;
