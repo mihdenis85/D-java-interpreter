@@ -109,6 +109,8 @@ public class SyntaxAnalyzer {
             case Code.tkWhileLoop -> analyzeWhileLoopDeclaration(peek);
             case Code.tkVar -> analyzeVariableDeclaration(peek);
             case Code.tkIdentifier -> analyzeIdentifierStatement(peek);
+            case Code.tkForLoop -> analyzeForLoopDeclaration(peek);
+            case Code.tkPrint -> analyzePrintStatement(peek);
             default -> throw new InvalidSyntaxException("Expected `"
                     + Code.tkIfStatement.name() + "`, `"
                     + Code.tkReturn.name() + "`, `"
@@ -117,6 +119,12 @@ public class SyntaxAnalyzer {
                     + "`, but got `" + peek + "` instead"
                     + "\n\tat line " + peek.span.lineNum + " column " + peek.span.posBegin);
         };
+    }
+
+    private StatementElement analyzePrintStatement(Token peek) {
+        System.out.println(peek.value);
+        skipToken();
+        return null;
     }
 
     private StatementElement analyzeIdentifierStatement(Token peek) {
@@ -136,7 +144,7 @@ public class SyntaxAnalyzer {
         return new ReturnStatement(returnValue, span);
     }
 
-    private SyntaxElement analyzeForLoopDeclaration(Token token) {
+    private StatementElement analyzeForLoopDeclaration(Token token) {
         try {
             Identifier ident = expectIdentifier();
 
@@ -186,9 +194,9 @@ public class SyntaxAnalyzer {
     public IfStatement analyzeIfStatementDeclaration(Token token) {
         try {
             expectKeyword(Code.tkIfStatement, 0);
+            skipToken();
 
             Expression expression = parseExpression();
-
             skipToken();
 
             expectKeyword(Code.tkThen, 0);
@@ -214,28 +222,6 @@ public class SyntaxAnalyzer {
 
     public Expression parseExpression() throws UnexpectedTokenException, TokenOutOfIndexException {
         ExpressionElement expression = parseExpressionElement();
-
-        List<Expression> chain = new ArrayList<>();
-        while (expectPunct(Code.tkDot, 0)) {
-            skipToken();
-
-            Code id = getIdentifierOnMatch();
-
-            List<ExpressionElement> arguments = null;
-            if (expectPunct(Code.tkOpenedBracket, 0)) {
-                skipToken();
-
-                arguments = new ArrayList<>();
-                if (!expectPunct(Code.tkClosedBracket, 0)) {
-                    arguments = parseArguments();
-                }
-
-                matchPunct(Code.tkClosedBracket);
-            }
-
-            chain.add(new Expression((src.core.syntax.interfaces.ExpressionElement) arguments));
-            // TODO: Implement normal arguments parsing
-        }
 
         return new Expression(expression);
     }
