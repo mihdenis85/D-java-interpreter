@@ -38,7 +38,6 @@ public class SyntaxAnalyzer {
         if (currentTokenIndex < tokensList.size()) {
             return tokensList.get(currentTokenIndex++);
         }
-
         return null;
     }
 
@@ -53,7 +52,7 @@ public class SyntaxAnalyzer {
     private Token peekToken(int ahead) throws TokenOutOfIndexException {
         if (currentTokenIndex + ahead < tokensList.size())
             return tokensList.get(currentTokenIndex + ahead);
-        throw new TokenOutOfIndexException("Could not parse the token");
+        throw new TokenOutOfIndexException("Token is out of bounds");
     }
 
     private void matchPunct(Code code) throws UnexpectedTokenException {
@@ -87,6 +86,23 @@ public class SyntaxAnalyzer {
                 && code != null;
     }
 
+    public boolean expectKeyword(Code tokenType) throws UnexpectedTokenException {
+        Token token = getNextToken();
+        if (token.type != tokenType) {
+            throw new UnexpectedTokenException(token.span, token.type, tokenType);
+        }
+        return true;
+    }
+
+    private Identifier expectIdentifier() throws InvalidIdentifierNameException {
+        Token token = getNextToken();
+        boolean isValid = Pattern.matches("^[a-zA-Z$_][a-zA-Z0-9$_]*$", token.value);
+        if (!isValid) {
+            throw new InvalidIdentifierNameException(token.span);
+        }
+        return new Identifier(token.value, token.span);
+    }
+
     public Program buildProgram() {
         ArrayList<SyntaxElement> syntaxElements = new ArrayList<>();
 
@@ -115,26 +131,22 @@ public class SyntaxAnalyzer {
 
         return new Program(syntaxElements);
     }
-
-    private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
-        Token peek = peekToken(0);
-        return switch (peek.type) {
-            case Code.tkIfStatement -> analyzeIfStatementDeclaration(peek);
-            case Code.tkReturn -> analyzeReturnStatement();
-            case Code.tkWhileLoop -> analyzeWhileLoopDeclaration(peek);
-            case Code.tkVar -> analyzeVariableDeclaration(peek);
-            case Code.tkIdentifier -> analyzeIdentifierStatement(peek);
-            default -> throw new InvalidSyntaxException("Expected `"
-                    + Code.tkIfStatement.name() + "`, `"
-                    + Code.tkReturn.name() + "`, `"
-                    + Code.tkWhileLoop.name() + "`, `"
-                    + Code.tkVar.name() + "` or `"
-                    + "`, but got `" + peek + "` instead"
-                    + "\n\tat line " + peek.span.lineNum + " column " + peek.span.posBegin);
-        };
+    private StatementElement analyzeIdentifierStatement(Token peek) {
+        return null;
     }
 
-    private StatementElement analyzeIdentifierStatement(Token peek) {
+    public Variable analyzeVariableDeclaration(Token token) {
+        System.out.println("Analyzing variable declaration");
+        try {
+            Keyword keyword = new Keyword(token.value, token.span);
+            Identifier identifier = expectIdentifier();
+
+            return new Variable(keyword, identifier);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+
         return null;
     }
 
@@ -213,8 +225,24 @@ public class SyntaxAnalyzer {
             System.out.println(e.getMessage());
             System.exit(0);
         }
-
         return null;
+    }
+    private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
+        Token peek = peekToken(0);
+        return switch (peek.type) {
+            case Code.tkIfStatement -> analyzeIfStatementDeclaration(peek);
+            case Code.tkReturn -> analyzeReturnStatement();
+            case Code.tkWhileLoop -> analyzeWhileLoopDeclaration(peek);
+            case Code.tkVar -> analyzeVariableDeclaration(peek);
+            case Code.tkIdentifier -> analyzeIdentifierStatement(peek);
+            default -> throw new InvalidSyntaxException("Expected `"
+                    + Code.tkIfStatement.name() + "`, `"
+                    + Code.tkReturn.name() + "`, `"
+                    + Code.tkWhileLoop.name() + "`, `"
+                    + Code.tkVar.name() + "` or `"
+                    + "`, but got `" + peek + "` instead"
+                    + "\n\tat line " + peek.span.lineNum + " column " + peek.span.posBegin);
+        };
     }
 
     public Expression parseExpression() throws UnexpectedTokenException, TokenOutOfIndexException {
@@ -280,41 +308,5 @@ public class SyntaxAnalyzer {
         }
 
         return body;
-    }
-
-    public boolean expectKeyword(Code tokenType) throws UnexpectedTokenException {
-        Token token = getNextToken();
-        if (token.type != tokenType) {
-            throw new UnexpectedTokenException(token.span, token.type, tokenType);
-        }
-
-        return true;
-    }
-
-    public Variable analyzeVariableDeclaration(Token token) {
-        System.out.println("Analyzing variable declaration");
-        try {
-            Keyword keyword = new Keyword(token.value, token.span);
-            Identifier identifier = expectIdentifier();
-
-            return new Variable(keyword, identifier);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
-        }
-
-        return null;
-    }
-
-    private Identifier expectIdentifier() throws InvalidIdentifierNameException {
-        Token token = getNextToken();
-
-        boolean isValid = Pattern.matches("^[a-zA-Z$_][a-zA-Z0-9$_]*$", token.value);
-
-        if (!isValid) {
-            throw new InvalidIdentifierNameException(token.span);
-        }
-
-        return new Identifier(token.value, token.span);
     }
 }
