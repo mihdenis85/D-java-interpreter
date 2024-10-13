@@ -1,5 +1,5 @@
-if true then
-    1
-else
-    2
-end
+//var integerVar1 := 3;
+//var integerVar2 := 22;
+var result;
+
+//result := integerVar1 + integerVar2;
