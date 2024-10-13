@@ -15,10 +15,7 @@ import src.core.enums.Code;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
-import src.core.syntax.statements.ForLoop;
-import src.core.syntax.statements.IfStatement;
-import src.core.syntax.statements.ReturnStatement;
-import src.core.syntax.statements.WhileLoop;
+import src.core.syntax.statements.*;
 
 import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
@@ -121,10 +118,15 @@ public class SyntaxAnalyzer {
         };
     }
 
-    private StatementElement analyzePrintStatement(Token peek) {
-        System.out.println(peek.value);
+    private StatementElement analyzePrintStatement(Token peek) throws TokenOutOfIndexException, UnexpectedTokenException {
+        System.out.println(peek.value + " " + peekToken(1).value);
+        Span span = peekToken(0).span;
+        expectKeyword(Code.tkPrint, 0);
         skipToken();
-        return null;
+
+        Expression returnValue = parseExpression();
+
+        return new PrintStatement(returnValue, span);
     }
 
     private StatementElement analyzeIdentifierStatement(Token peek) {
