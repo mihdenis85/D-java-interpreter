@@ -2,4 +2,10 @@
 //var integerVar2 := 22;
 var result;
 
-//result := integerVar1 + integerVar2;
+result := integerVar1 + integerVar2;
+
+//if true then
+  // return 1;
+//end;
+
+// return 1;
