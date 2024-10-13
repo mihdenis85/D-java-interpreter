@@ -1,8 +1,10 @@
 //var integerVar1 := 3;
 //var integerVar2 := 22;
-var result;
+//var result;
 
-result := integerVar1 + integerVar2;
+// result := integerVar1 + integerVar2;
+
+return integerVar2;
 
 //if true then
   // return 1;

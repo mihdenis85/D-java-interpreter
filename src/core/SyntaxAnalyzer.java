@@ -65,7 +65,6 @@ public class SyntaxAnalyzer {
 
     private void matchKeyword(Code code) {
         Token nextToken = getNextToken();
-        System.out.println(nextToken.type);
         if (!(Keywords.contains(nextToken.type) && code != null)) {
             throw new InvalidSyntaxException("Expected keyword `" + code
                     + "`, but got `" + nextToken.type + "` instead"
@@ -117,7 +116,7 @@ public class SyntaxAnalyzer {
                     + Code.tkReturn.name() + "`, `"
                     + Code.tkWhileLoop.name() + "`, `"
                     + Code.tkVar.name() + "` or `"
-                    + "`, but got `" + peek + "` instead"
+                    + "`, but got `" + peek.type + "` instead"
                     + "\n\tat line " + peek.span.lineNum + " column " + peek.span.posBegin);
         };
     }
@@ -130,8 +129,12 @@ public class SyntaxAnalyzer {
 
 //            Expression expression = parseExpression();
             skipToken();
+            skipToken();
+            skipToken();
 
-//            return new AssignmentStatement(expression);
+            matchPunct(Code.tkSemicolon);
+
+//            return new AssignmentStatement(identifier, expression);
             System.out.println("Assignment statement");
             return null;
         } catch (Exception e) {
@@ -165,6 +168,8 @@ public class SyntaxAnalyzer {
         if (hasNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
             returnValue = parseExpression();
         }
+
+        matchPunct(Code.tkSemicolon);
 
         return new ReturnStatement(returnValue, token.span);
     }
@@ -250,44 +255,67 @@ public class SyntaxAnalyzer {
         return null;
     }
 
+    public boolean expectUnaryOperator(Token token) {
+        return token.type == Code.tkPlusSign || token.type == Code.tkMinusSign || token.type == Code.tkNot;
+    }
+
     public Expression parseExpression() throws UnexpectedTokenException, TokenOutOfIndexException {
+        Token token = peekToken(0);
+
+        if (expectUnaryOperator(token)) {
+            ExpressionElement unaryExpression = parseExpressionElement();
+        }
+
         ExpressionElement expression = parseExpressionElement();
 
-        ArrayList<Expression> chain = new ArrayList<>();
-        while (expectPunct(Code.tkDot, 0)) {
-            skipToken();
-
-            Code id = getIdentifierOnMatch();
-
-            List<ExpressionElement> arguments = null;
-            if (expectPunct(Code.tkOpenedBracket, 0)) {
-                skipToken();
-
-                arguments = new ArrayList<>();
-                if (!expectPunct(Code.tkClosedBracket, 0)) {
-                    arguments = parseArguments();
-                }
-
-                matchPunct(Code.tkClosedBracket);
-            }
-
-            chain.add(new Expression((src.core.syntax.interfaces.ExpressionElement) arguments));
-        }
+//        ArrayList<Expression> chain = new ArrayList<>();
+//        while (expectPunct(Code.tkDot, 0)) {
+//            skipToken();
+//
+//            Code id = getIdentifierOnMatch();
+//
+//            List<ExpressionElement> arguments = null;
+//            if (expectPunct(Code.tkOpenedBracket, 0)) {
+//                skipToken();
+//
+//                arguments = new ArrayList<>();
+//                if (!expectPunct(Code.tkClosedBracket, 0)) {
+//                    arguments = parseArguments();
+//                }
+//
+//                matchPunct(Code.tkClosedBracket);
+//            }
+//
+//            chain.add(new Expression((src.core.syntax.interfaces.ExpressionElement) arguments));
+//        }
 
         return new Expression(expression);
     }
 
 
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
-        Token peek = peekToken(0);
-        return switch (peek) {
-            case IntegerLiteral il -> { skipToken(); yield il; }
-            case RealLiteral rl -> { skipToken(); yield rl; }
-            case BooleanLiteral bl -> { skipToken(); yield bl; }
-            case StringLiteral sl -> { skipToken(); yield sl; }
-            default -> throw new UnexpectedTokenException(peek.span, peek.getType(), null);
-        };
+        try {
+            Token token = peekToken(0);
+            skipToken();
+            return switch(token.type) {
+                case Code.tkIntegerLiteral -> new IntegerLiteral(token.span, token.value);
+                case Code.tkRealLiteral -> new RealLiteral(token.span, token.value);
+                case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
+                case Code.tkBooleanLiteral -> new BooleanLiteral(token.span, token.value);
+                case Code.tkIdentifier -> new Identifier(token.value, token.span);
+//                case Code.tkPlusSign -> new UnaryPlus(token.span, token.value);
+//                case Code.tkMinusSign -> new UnaryMinus(token.span, token.value);
+//                case Code.tkNewline -> new Not(token.span, token.value);
+                default -> throw new UnexpectedTokenException(token.span, token.type, null);
+            };
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+
+        return null;
     }
+
     private List<ExpressionElement> parseArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         List<ExpressionElement> arguments = new ArrayList<>();
 
@@ -325,6 +353,7 @@ public class SyntaxAnalyzer {
 
     public Variable analyzeDeclarationStatement(Token token) {
         try {
+            System.out.println("Analyzing declaration statement");
             matchKeyword(Code.tkVar);
 
             Keyword keyword = new Keyword(token.value, token.span);
@@ -333,6 +362,8 @@ public class SyntaxAnalyzer {
             if (expectKeyword(Code.tkAssignment, 0)) {
                 System.out.println("Analyzing assignment expression");
 //                parseExpression();
+                skipToken();
+                skipToken();
             }
 
             matchPunct(Code.tkSemicolon);
