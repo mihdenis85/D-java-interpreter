@@ -4,8 +4,11 @@
 
 //result := integerVar1 + integerVar2;
 
-//return +integerVar2 + num2;
+//print val1, val2, val3;
 
+return +integerVar2 + not num2;
+
+//return testVar is string;
 //if true then
   // return 1;
 //end;

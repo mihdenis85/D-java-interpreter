@@ -1,22 +1,24 @@
 package src.core.syntax.statements;
 
 import src.core.Span;
+import src.core.syntax.Expression;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class PrintStatement implements StatementElement {
-    private final ExpressionElement printValue;
+    private final ArrayList<Expression> expressions;
     private final Span span;
 
-    public PrintStatement(ExpressionElement returnValue, Span span) {
-        this.printValue = returnValue;
+    public PrintStatement(ArrayList<Expression> expressions, Span span) {
+        this.expressions = expressions;
         this.span = span;
     }
 
-    public ExpressionElement getPrintValue() {
-        return printValue;
+    public ArrayList<Expression> getExpressions() {
+        return expressions;
     }
 
     public Span getSpan() {

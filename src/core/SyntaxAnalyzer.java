@@ -14,10 +14,7 @@ import src.core.enums.Code;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
-import src.core.syntax.statements.ForLoop;
-import src.core.syntax.statements.IfStatement;
-import src.core.syntax.statements.ReturnStatement;
-import src.core.syntax.statements.WhileLoop;
+import src.core.syntax.statements.*;
 
 import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
@@ -131,10 +128,7 @@ public class SyntaxAnalyzer {
 
             matchPunct(Code.tkSemicolon);
 
-//            return new AssignmentStatement(identifier, expression);
-            System.out.println("Assignment statement");
-            // TODO: Create AssignmentStatement class
-            return null;
+            return new AssignmentStatement(identifier, expression);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(0);
@@ -145,11 +139,27 @@ public class SyntaxAnalyzer {
 
     private StatementElement analyzePrintStatement() {
         try {
-            matchPunct(Code.tkPrint);
+            matchKeyword(Code.tkPrint);
 
             Expression expression = parseExpression();
 
-            return null;
+            ArrayList<Expression> expressions = new ArrayList<>();
+            expressions.add(expression);
+            Token token = peekToken(0);
+
+            while (!ExpressionStopper.contains(token.type) || token.type == Code.tkComma) {
+                if (token.type == Code.tkComma) {
+                    skipToken();
+                    token = peekToken(0);
+                    continue;
+                }
+
+                expressions.add(parseExpression());
+                token = peekToken(0);
+            }
+
+            matchPunct(Code.tkSemicolon);
+            return new PrintStatement(expressions, token.span);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -308,6 +318,13 @@ public class SyntaxAnalyzer {
                 case Code.tkXor -> new LogicalXor(token.value, token.span);
                 case Code.tkMultiplySign -> new MultiplySign(token.value, token.span);
                 case Code.tkNotEqualSign -> new NotEqualSign(token.value, token.span);
+                case Code.tkString -> new StringType(token.value, token.span);
+                case Code.tkArray -> new ArrayType(token.value, token.span);
+                case Code.tkTuple -> new TupleType(token.value, token.span);
+                case Code.tkBoolean -> new BooleanType(token.value, token.span);
+                case Code.tkReal -> new RealType(token.value, token.span);
+                case Code.tkEmpty -> new EmptyType(token.value, token.span);
+                case Code.tkInteger -> new IntegerType(token.value, token.span);
                 default -> throw new UnexpectedTokenException(token.span, token.type, null);
             };
         } catch (Exception e) {
