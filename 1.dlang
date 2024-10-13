@@ -1,6 +1,19 @@
-var A := 3;
-var B := 22;
-var result;
-result := A + B;
-print result is int; // true
-print result; // 25
+//var integerVar1 := 3;
+//var integerVar2 := 22;
+//var result;
+
+// result := integerVar1 + integerVar2;
+
+//return +integerVar2;
+
+//if true then
+  // return 1;
+//end;
+
+//return 1;
+
+while true loop
+    if false then
+        return 2;
+    end;
+end;

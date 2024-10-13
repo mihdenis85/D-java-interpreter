@@ -1,9 +1,14 @@
 package src.core.expressionElements;
 
 import src.core.Span;
+import src.core.syntax.interfaces.ExpressionElement;
 
-public class UnaryNot extends ExpressionElementClass {
+public class UnaryNot implements ExpressionElement {
+    public String value;
+    public Span span;
+
     public UnaryNot(String value, Span span) {
-        super(value, span);
+        this.value = value;
+        this.span = span;
     }
 }
