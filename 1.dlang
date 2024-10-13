@@ -1,5 +1,6 @@
-//var integerVar1 := 3;
-//var integerVar2 := 22;
+var A := 3;
+var B := 22;
 var result;
-
-//result := integerVar1 + integerVar2;
+result := A + B;
+print result is int; // true
+print result; // 25

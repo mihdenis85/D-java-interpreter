@@ -16,8 +16,6 @@ import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.*;
-
-import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.*;
@@ -35,7 +33,6 @@ public class SyntaxAnalyzer {
         if (currentTokenIndex < tokensList.size()) {
             return tokensList.get(currentTokenIndex++);
         }
-
         return null;
     }
 
@@ -86,7 +83,6 @@ public class SyntaxAnalyzer {
 
     public Program buildProgram() {
         ArrayList<SyntaxElement> syntaxElements = new ArrayList<>();
-
         try {
             while (currentTokenIndex < tokensList.size()) {
                 syntaxElements.add(parseStatement());
@@ -94,7 +90,6 @@ public class SyntaxAnalyzer {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
         return new Program(syntaxElements);
     }
 
@@ -228,7 +223,6 @@ public class SyntaxAnalyzer {
         return new Expression(expression);
     }
 
-
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
         return switch (peek) {
@@ -282,6 +276,7 @@ public class SyntaxAnalyzer {
             Identifier identifier = expectIdentifier();
 
             if (expectKeyword(Code.tkAssignment, 0)) {
+                skipToken();
                 parseExpression();
             }
 
