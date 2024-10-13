@@ -1,9 +1,14 @@
 package src.core.expressionElements;
 
 import src.core.Span;
+import src.core.syntax.interfaces.ExpressionElement;
 
-public class UnaryMinus extends ExpressionElementClass {
+public class UnaryMinus implements ExpressionElement {
+    public String value;
+    public Span span;
+
     public UnaryMinus(String value, Span span) {
-        super(value, span);
+        this.value = value;
+        this.span = span;
     }
 }
