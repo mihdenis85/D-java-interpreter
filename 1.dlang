@@ -6,7 +6,9 @@
 
 //print val1, val2, val3;
 
-return +integerVar2 + not num2;
+//return +integerVar2 + not num2;
+
+var array := [ var1 + var2, , 2];
 
 //return testVar is string;
 //if true then

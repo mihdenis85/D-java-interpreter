@@ -98,6 +98,10 @@ public class SyntaxAnalyzer {
         return new Program(syntaxElements);
     }
 
+
+    // TODO: Function expression
+    // TODO: Tuple literal
+    // TODO: Empty literal for array literal, when element has no value
     private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
         return switch (peek.type) {
@@ -261,6 +265,7 @@ public class SyntaxAnalyzer {
 
     public Expression parseExpression() throws UnexpectedTokenException, TokenOutOfIndexException {
         Token token = peekToken(0);
+
         ArrayList<ExpressionElement> expressions = new ArrayList<>();
 
         if (expectUnaryOperator(token)) {
@@ -278,11 +283,31 @@ public class SyntaxAnalyzer {
         return new Expression(expressions);
     }
 
+    public ArrayLiteral parseArray() throws TokenOutOfIndexException, UnexpectedTokenException {
+        Token token = peekToken(0);
+        ArrayLiteral array = new ArrayLiteral(new ArrayList<>(), token.span);
+        while (token.type != Code.tkClosedArrayBracket) {
+            if (token.type == Code.tkComma) {
+                skipToken();
+                token = peekToken(0);
+                continue;
+            }
+
+            ArrayList<Expression> elements = array.getElements();
+            elements.add(parseExpression());
+            array.setElements(elements);
+            token = peekToken(0);
+        }
+
+        skipToken();
+        return array;
+    }
 
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         try {
             Token token = getNextToken();
             return switch(token.type) {
+                case Code.tkOpenedArrayBracket -> parseArray();
                 case Code.tkIntegerLiteral -> new IntegerLiteral(token.span, token.value);
                 case Code.tkRealLiteral -> new RealLiteral(token.span, token.value);
                 case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
