@@ -2,9 +2,9 @@
 //var integerVar2 := 22;
 //var result;
 
-// result := integerVar1 + integerVar2;
+//result := integerVar1 + integerVar2;
 
-//return +integerVar2;
+//return +integerVar2 + num2;
 
 //if true then
   // return 1;
@@ -12,8 +12,6 @@
 
 //return 1;
 
-while true loop
-    if false then
-        return 2;
-    end;
-end;
+//for element in 10 loop
+  //  return 1;
+//end;
