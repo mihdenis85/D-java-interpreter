@@ -23,7 +23,8 @@ public enum Keywords {
     tkIfStatement,
     tkFunction,
     tkElse,
-    tkLoop;
+    tkLoop,
+    tkIn;
 
 
     public static boolean contains(Code type) {
