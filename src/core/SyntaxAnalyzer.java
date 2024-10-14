@@ -17,9 +17,7 @@ import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.*;
 
-import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.*;
 
 public class SyntaxAnalyzer {
@@ -130,6 +128,14 @@ public class SyntaxAnalyzer {
                 identifier = new ArrayIndex(expression, token.span);
 
                 matchPunct(Code.tkClosedArrayBracket);
+            }
+            if (token.type == Code.tkOpenedBracket) {
+                skipToken();
+
+                ArrayList<ExpressionElement> arguments = parseArguments();
+                matchPunct(Code.tkClosedBracket);
+                matchPunct(Code.tkSemicolon);
+                return new FunctionCall(identifier, arguments);
             }
 
             matchPunct(Code.tkAssignment);
@@ -404,6 +410,13 @@ public class SyntaxAnalyzer {
                         skipToken();
 
                         yield parseExpressionElement();
+                    }
+                    if (nextToken.type == Code.tkOpenedBracket) {
+                        Identifier identifier = new Identifier(token.value, token.span);
+                        skipToken();
+                        ArrayList<ExpressionElement> arguments = parseArguments();
+                        matchPunct(Code.tkClosedBracket);
+                        yield new FunctionCall(identifier, arguments);
                     }
 
                     yield new Identifier(token.value, token.span);
