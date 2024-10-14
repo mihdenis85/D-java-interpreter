@@ -243,8 +243,9 @@ public class SyntaxAnalyzer {
             ArrayList<StatementElement> statementBody = parseBody();
 
             ArrayList<StatementElement> elseStatementBody = new ArrayList<>();
-            if (expectKeyword(Code.tkElse, 0)) {
-                elseStatementBody = parseBody();
+            while (expectKeyword(Code.tkElse, 0)) {
+                skipToken();
+                elseStatementBody.add(parseStatement());
             }
 
             matchKeyword(Code.tkEnd);
