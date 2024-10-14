@@ -380,10 +380,11 @@ public class SyntaxAnalyzer {
         skipToken();
         return tuple;
     }
+
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         try {
             Token token = getNextToken();
-            return switch(token.type) {
+            return switch (token.type) {
                 case Code.tkOpenedArrayBracket -> {
                     Token prevToken = peekToken(-2);
                     if (prevToken.type == Code.tkIdentifier) {
@@ -412,7 +413,7 @@ public class SyntaxAnalyzer {
                 case Code.tkBooleanLiteral -> new BooleanLiteral(token.span, token.value);
                 case Code.tkIdentifier -> {
                     Token nextToken = peekToken(0);
-                    if (nextToken.type == Code.tkDot){
+                    if (nextToken.type == Code.tkDot) {
                         skipToken();
 
                         yield parseExpressionElement();
