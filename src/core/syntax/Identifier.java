@@ -3,9 +3,10 @@ package src.core.syntax;
 import src.core.Span;
 import src.core.Token;
 import src.core.enums.Code;
+import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
 
-public class Identifier extends Token implements ExpressionElement {
+public class Identifier extends Token implements ExpressionElement, AssignmentIdentifier {
     private final String value;
     private final Span span;
 
