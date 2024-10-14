@@ -79,9 +79,8 @@ public class SyntaxAnalyzer {
     }
 
     private boolean expectPunct(Code code, int ahead) throws TokenOutOfIndexException {
-        return currentTokenIndex + ahead < tokensList.size()
-                && Punct.contains(peekToken(ahead).type)
-                && code != null;
+        Token token = peekToken(ahead);
+        return Punct.contains(token.type) && code != null && code == token.type;
     }
 
     public Program buildProgram() {
@@ -99,9 +98,6 @@ public class SyntaxAnalyzer {
         return new Program(syntaxElements);
     }
 
-
-    // TODO: Function expression
-    // TODO: Empty literal for array literal, when element has no value
     private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
         return switch (peek.type) {
@@ -148,6 +144,23 @@ public class SyntaxAnalyzer {
             System.exit(0);
         }
 
+        return null;
+    }
+
+    private ExpressionElement analyzeFunctionDeclaration() {
+        try {
+            matchPunct(Code.tkOpenedBracket);
+            ArrayList<ExpressionElement> arguments = parseArguments();
+
+            matchPunct(Code.tkClosedBracket);
+            matchKeyword(Code.tkIs);
+            ArrayList<StatementElement> body = parseBody();
+            matchKeyword(Code.tkEnd);
+
+            return new FunctionStatement(arguments, body);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         return null;
     }
 
@@ -395,6 +408,8 @@ public class SyntaxAnalyzer {
 
                     yield new Identifier(token.value, token.span);
                 }
+                case Code.tkIdentifier -> new Identifier(token.value, token.span);
+                case Code.tkFunction -> analyzeFunctionDeclaration();
                 case Code.tkPlusSign -> {
                     Token nextToken = peekToken(0);
                     Token prevToken = peekToken(-2);
@@ -442,8 +457,8 @@ public class SyntaxAnalyzer {
         return null;
     }
 
-    private List<ExpressionElement> parseArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
-        List<ExpressionElement> arguments = new ArrayList<>();
+    private ArrayList<ExpressionElement> parseArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+        ArrayList<ExpressionElement> arguments = new ArrayList<>();
 
         if (!expectPunct(Code.tkClosedBracket, 0)) {
             arguments.add(parseExpression());

@@ -8,6 +8,7 @@ public enum ExpressionStopper {
     tkSemicolon,
     tkThen,
     tkClosedArrayBracket,
+    tkClosedBracket,
     tkClosedTupleBracket;
 
     public static boolean contains(Code type) {
