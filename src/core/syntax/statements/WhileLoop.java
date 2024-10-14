@@ -24,7 +24,7 @@ public class WhileLoop implements StatementElement {
 
     @Override
     public String toJSONString() {
-        return "{\"WhileLoop\": {\n" + "Condition: " + condition.toJSONString() + ",\n" +
-                "StatementBody: " + JSONConvertable.listToJsonString(statementBody) + "\n},";
+        return "{\"WhileLoop\": {" + "Condition: " + condition.toJSONString() + "," +
+                "StatementBody: " + JSONConvertable.listToJsonString(statementBody) + "}";
     }
 }

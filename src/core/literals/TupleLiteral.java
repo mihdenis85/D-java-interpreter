@@ -1,13 +1,10 @@
 package src.core.literals;
 
-import src.core.Span;
-import src.core.enums.Code;
 import src.core.expressionElements.TupleElement;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.JSONConvertable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class TupleLiteral implements ExpressionElement {
     private ArrayList<TupleElement> elements;
@@ -26,6 +23,6 @@ public class TupleLiteral implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "\"TupleLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + ",\n" + "elements: " + JSONConvertable.mapToJsonString(elements) + "\n}";
+        return "\"TupleLiteral\": {" + "elements: " + JSONConvertable.listToJsonString(elements) + "}";
     }
 }

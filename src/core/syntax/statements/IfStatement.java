@@ -31,8 +31,8 @@ public class IfStatement implements StatementElement {
 
     @Override
     public String toJSONString() {
-        return "{\"IfStatement\": {\n\t" + "Condition: " + condition.toJSONString() + ",\n\t" +
-                "statementBody: " + JSONConvertable.listToJsonString(statementBody) + ",\n\t" +
-                "elseBody: " + JSONConvertable.listToJsonString(elseStatementBody) + "\n},";
+        return "{\"IfStatement\": {" + condition.toJSONString() + "," +
+                "statementBody: " + JSONConvertable.listToJsonString(statementBody) + "," +
+                "elseBody: " + JSONConvertable.listToJsonString(elseStatementBody) + "}}";
     }
 }

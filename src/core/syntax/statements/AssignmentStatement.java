@@ -25,7 +25,7 @@ public class AssignmentStatement implements StatementElement, JSONConvertable {
 
     @Override
     public String toJSONString() {
-        return "{\"AssignmentStatement\": {\n" + "identifier: " + identifier.toJSONString() + ",\n" +
-                "expression: " + expression.toJSONString() + "\n},";
+        return "{\"AssignmentStatement\": {" + identifier.toJSONString() + "," +
+                expression.toJSONString() + "}";
     }
 }
