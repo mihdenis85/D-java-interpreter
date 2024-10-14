@@ -332,12 +332,25 @@ public class SyntaxAnalyzer {
                 token = peekToken(0);
                 continue;
             }
+            ArrayList<TupleElement> elements = tuple.getElements();
 
             Identifier identifier = expectIdentifier();
 
+            Token nextToken = peekToken(0);
+            if (nextToken.type == Code.tkComma) {
+                skipToken();
+                ExpressionElement element = new EmptyLiteral(token.span);
+                Expression expression = new Expression(new ArrayList<>());
+                expression.expressions.add(element);
+                TupleElement tupleElement = new TupleElement(identifier, expression);
+                elements.add(tupleElement);
+                tuple.setElements(elements);
+                token = peekToken(0);
+                continue;
+            }
+
             matchPunct(Code.tkAssignment);
 
-            ArrayList<TupleElement> elements = tuple.getElements();
             Expression element = parseExpression();
             TupleElement tupleElement = new TupleElement(identifier, element);
             elements.add(tupleElement);
@@ -372,7 +385,16 @@ public class SyntaxAnalyzer {
                 case Code.tkRealLiteral -> new RealLiteral(token.span, token.value);
                 case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
                 case Code.tkBooleanLiteral -> new BooleanLiteral(token.span, token.value);
-                case Code.tkIdentifier -> new Identifier(token.value, token.span);
+                case Code.tkIdentifier -> {
+                    Token nextToken = peekToken(0);
+                    if (nextToken.type == Code.tkDot){
+                        skipToken();
+
+                        yield parseExpressionElement();
+                    }
+
+                    yield new Identifier(token.value, token.span);
+                }
                 case Code.tkPlusSign -> {
                     Token nextToken = peekToken(0);
                     Token prevToken = peekToken(-2);

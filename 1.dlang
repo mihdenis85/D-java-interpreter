@@ -1,3 +1,2 @@
-t := t + {d:=3};
-
-t[1] := 1;
+var myTuple := { x := 5, y, z := 10 }; // 'y' is a pair without a value
+//print myTuple.x, myTuple.2, myTuple.z; // Should print 5, y, 10
