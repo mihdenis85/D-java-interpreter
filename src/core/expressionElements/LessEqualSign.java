@@ -14,6 +14,6 @@ public class LessEqualSign implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"LessEqualSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"LessEqualSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

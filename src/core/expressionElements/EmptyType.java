@@ -14,6 +14,6 @@ public class EmptyType implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"EmptyType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"EmptyType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

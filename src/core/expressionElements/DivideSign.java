@@ -14,6 +14,6 @@ public class DivideSign implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"DivideSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"DivideSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

@@ -14,6 +14,6 @@ public class IntegerType implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"IntegerType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"IntegerType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

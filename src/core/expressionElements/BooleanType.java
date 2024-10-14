@@ -14,6 +14,6 @@ public class BooleanType implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"BooleanType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"BooleanType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

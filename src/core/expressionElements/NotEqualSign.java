@@ -14,6 +14,6 @@ public class NotEqualSign implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"NotEqualSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+        return "\"NotEqualSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

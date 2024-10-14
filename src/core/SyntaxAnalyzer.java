@@ -18,7 +18,6 @@ import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.*;
 
 public class SyntaxAnalyzer {

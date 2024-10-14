@@ -14,6 +14,6 @@ public class GreaterSign implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"GreaterSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"GreaterSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

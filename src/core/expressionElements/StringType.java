@@ -14,6 +14,6 @@ public class StringType implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"StringType\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+        return "\"StringType\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

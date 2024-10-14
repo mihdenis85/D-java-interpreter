@@ -26,6 +26,6 @@ public class ReturnStatement implements StatementElement {
     @Override
     public String toJSONString() {
         return "{\"ReturnStatement\": {\n" + "ReturnValue: " + returnValue.toJSONString() + ",\n" +
-                "Span: " + span.toString() + "\n}}";
+                "Span: " + span.toString() + "\n}";
     }
 }

@@ -14,6 +14,6 @@ public class RealType implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"RealType\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+        return "\"RealType\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

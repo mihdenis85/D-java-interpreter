@@ -16,6 +16,6 @@ public class ArrayIndex implements AssignmentIdentifier, JSONConvertable {
 
     @Override
     public String toJSONString() {
-        return "{\"ArrayIndex\": {" + "span: " + span.toString() + ",\n\t" + expression.toJSONString() + "\n}";
+        return "\"ArrayIndex\": {" + "span: " + span.toString() + ",\n\t" + expression.toJSONString() + "\n}";
     }
 }

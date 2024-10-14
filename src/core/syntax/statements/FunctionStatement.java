@@ -23,6 +23,6 @@ public class FunctionStatement implements ExpressionElement {
     @Override
     public String toJSONString() {
         return "{\"FunctionStatement\": {" + "Arguments: " + JSONConvertable.listToJsonString(arguments) + "," +
-                "Body: " + JSONConvertable.listToJsonString(body) + "}}";
+                "Body: " + JSONConvertable.listToJsonString(body) + "}";
     }
 }

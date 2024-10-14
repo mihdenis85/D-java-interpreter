@@ -14,6 +14,6 @@ public class LogicalOr implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"LogicalOr\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+        return "\"LogicalOr\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

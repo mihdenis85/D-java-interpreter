@@ -33,6 +33,6 @@ public class IfStatement implements StatementElement {
     public String toJSONString() {
         return "{\"IfStatement\": {" + condition.toJSONString() + "," +
                 "statementBody: " + JSONConvertable.listToJsonString(statementBody) + "," +
-                "elseBody: " + JSONConvertable.listToJsonString(elseStatementBody) + "}}";
+                "elseBody: " + JSONConvertable.listToJsonString(elseStatementBody) + "}";
     }
 }

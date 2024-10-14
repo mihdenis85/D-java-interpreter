@@ -14,6 +14,6 @@ public class LogicalAnd implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"LogicalAnd\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"LogicalAnd\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

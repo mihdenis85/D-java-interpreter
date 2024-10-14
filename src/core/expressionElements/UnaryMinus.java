@@ -14,6 +14,6 @@ public class UnaryMinus implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"UnaryMinus\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+        return "\"UnaryMinus\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

@@ -14,6 +14,6 @@ public class EqualSign implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"EqualSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"EqualSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

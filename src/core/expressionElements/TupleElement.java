@@ -23,6 +23,6 @@ public class TupleElement implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"TupleElement\": {\n" + identifier.toJSONString() + "," + expression.toJSONString() + "}";
+        return "\"TupleElement\": {\n" + identifier.toJSONString() + "," + expression.toJSONString() + "}";
     }
 }

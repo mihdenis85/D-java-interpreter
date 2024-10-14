@@ -14,6 +14,6 @@ public class IsOperator implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "{\"IsOperator\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+        return "\"IsOperator\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }
