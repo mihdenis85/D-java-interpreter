@@ -2,21 +2,26 @@ package src.core.literals;
 
 import src.core.Span;
 import src.core.enums.Code;
+import src.core.expressionElements.TupleElement;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.JSONConvertable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TupleLiteral extends Literal implements ExpressionElement {
-    private final HashMap<ExpressionElement, ExpressionElement> elements;
+public class TupleLiteral implements ExpressionElement {
+    private ArrayList<TupleElement> elements;
 
-    public TupleLiteral(Span span, Code type, String value, HashMap<ExpressionElement, ExpressionElement> elements) {
-        super(span, type, value);
+    public TupleLiteral(ArrayList<TupleElement> elements) {
         this.elements = elements;
     }
 
-    public HashMap<ExpressionElement, ExpressionElement> getElements() {
+    public ArrayList<TupleElement> getElements() {
         return elements;
+    }
+
+    public void setElements(ArrayList<TupleElement> elements) {
+        this.elements = elements;
     }
 
     @Override
