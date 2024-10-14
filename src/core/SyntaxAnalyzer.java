@@ -322,6 +322,33 @@ public class SyntaxAnalyzer {
         return array;
     }
 
+    public TupleLiteral parseTuple() throws TokenOutOfIndexException, InvalidIdentifierNameException, UnexpectedTokenException {
+        Token token = peekToken(0);
+        TupleLiteral tuple = new TupleLiteral(new ArrayList<>());
+
+
+        while (token.type != Code.tkClosedTupleBracket) {
+            if (token.type == Code.tkComma) {
+                skipToken();
+                token = peekToken(0);
+                continue;
+            }
+
+            Identifier identifier = expectIdentifier();
+
+            matchPunct(Code.tkAssignment);
+
+            ArrayList<TupleElement> elements = tuple.getElements();
+            Expression element = parseExpression();
+            TupleElement tupleElement = new TupleElement(identifier, element);
+            elements.add(tupleElement);
+            tuple.setElements(elements);
+            token = peekToken(0);
+        }
+
+        skipToken();
+        return tuple;
+    }
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         try {
             Token token = getNextToken();
@@ -330,6 +357,14 @@ public class SyntaxAnalyzer {
                     Token prevToken = peekToken(-2);
                     if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkComma || prevToken.type == Code.tkOpenedArrayBracket) {
                         yield parseArray();
+                    }
+
+                    yield parseExpression();
+                }
+                case Code.tkOpenedTupleBracket -> {
+                    Token prevToken = peekToken(-2);
+                    if (prevToken.type == Code.tkAssignment) {
+                        yield parseTuple();
                     }
 
                     yield parseExpression();
