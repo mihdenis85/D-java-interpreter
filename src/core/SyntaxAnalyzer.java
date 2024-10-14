@@ -101,7 +101,6 @@ public class SyntaxAnalyzer {
 
 
     // TODO: Function expression
-    // TODO: Tuple literal
     // TODO: Empty literal for array literal, when element has no value
     private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
@@ -127,11 +126,11 @@ public class SyntaxAnalyzer {
         try {
             AssignmentIdentifier identifier = expectIdentifier();
 
-            if (expectPunct(Code.tkOpenedArrayBracket, 0)) {
+            Token token = peekToken(0);
+            if (token.type == Code.tkOpenedArrayBracket) {
                 skipToken();
 
                 Expression expression = parseExpression();
-                Token token = peekToken(-1);
                 identifier = new ArrayIndex(expression, token.span);
 
                 matchPunct(Code.tkClosedArrayBracket);
@@ -363,7 +362,7 @@ public class SyntaxAnalyzer {
                 }
                 case Code.tkOpenedTupleBracket -> {
                     Token prevToken = peekToken(-2);
-                    if (prevToken.type == Code.tkAssignment) {
+                    if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkPlusSign) {
                         yield parseTuple();
                     }
 
