@@ -11,6 +11,7 @@ import src.core.expressionElements.*;
 import src.core.literals.*;
 import src.core.syntax.*;
 import src.core.enums.Code;
+import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
@@ -124,7 +125,17 @@ public class SyntaxAnalyzer {
 
     public StatementElement analyzeAssignmentStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         try {
-            Identifier identifier = expectIdentifier();
+            AssignmentIdentifier identifier = expectIdentifier();
+
+            if (expectPunct(Code.tkOpenedArrayBracket, 0)) {
+                skipToken();
+
+                Expression expression = parseExpression();
+                Token token = peekToken(-1);
+                identifier = new ArrayIndex(expression, token.span);
+
+                matchPunct(Code.tkClosedArrayBracket);
+            }
 
             matchPunct(Code.tkAssignment);
 
@@ -288,13 +299,20 @@ public class SyntaxAnalyzer {
         Token token = peekToken(0);
         ArrayLiteral array = new ArrayLiteral(new ArrayList<>(), token.span);
         while (token.type != Code.tkClosedArrayBracket) {
+            ArrayList<Expression> elements = array.getElements();
+            if (token.type == Code.tkOpenedArrayBracket) {
+                elements.add(parseExpression());
+                array.setElements(elements);
+                token = peekToken(0);
+                continue;
+            }
+
             if (token.type == Code.tkComma) {
                 skipToken();
                 token = peekToken(0);
                 continue;
             }
 
-            ArrayList<Expression> elements = array.getElements();
             elements.add(parseExpression());
             array.setElements(elements);
             token = peekToken(0);
@@ -308,7 +326,14 @@ public class SyntaxAnalyzer {
         try {
             Token token = getNextToken();
             return switch(token.type) {
-                case Code.tkOpenedArrayBracket -> parseArray();
+                case Code.tkOpenedArrayBracket -> {
+                    Token prevToken = peekToken(-2);
+                    if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkComma || prevToken.type == Code.tkOpenedArrayBracket) {
+                        yield parseArray();
+                    }
+
+                    yield parseExpression();
+                }
                 case Code.tkIntegerLiteral -> new IntegerLiteral(token.span, token.value);
                 case Code.tkRealLiteral -> new RealLiteral(token.span, token.value);
                 case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
