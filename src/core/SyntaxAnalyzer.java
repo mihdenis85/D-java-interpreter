@@ -433,7 +433,8 @@ public class SyntaxAnalyzer {
                 }
                 case Code.tkMinusSign -> {
                     Token nextToken = peekToken(0);
-                    if (nextToken.type == Code.tkIdentifier) {
+                    Token prevToken = peekToken(-2);
+                    if (nextToken.type == Code.tkIdentifier && prevToken.type != Code.tkIdentifier) {
                         yield new UnaryMinus(token.value, token.span);
                     }
 
