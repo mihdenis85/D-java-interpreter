@@ -38,7 +38,7 @@ public class Variable implements StatementElement {
 
     @Override
     public String toJSONString() {
-        return "{\"Variable\": {" +
+        return "\"Variable\": {" +
                 keyword.toJSONString() + "," +
                 identifier.toJSONString() + "," +
                 expression.toJSONString() + "}";

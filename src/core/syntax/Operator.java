@@ -31,7 +31,7 @@ public class Operator implements ExpressionElement, SyntaxElement {
 
     @Override
     public String toJSONString() {
-        return "{\"Operator\": {\n" + "Keyword: " + keyword.toJSONString() + ",\n" +
+        return "\"Operator\": {\n" + "Keyword: " + keyword.toJSONString() + ",\n" +
                 "Identifier: " + identifier.toJSONString() + ",\n" +
                 "Expressions: " + JSONConvertable.listToJsonString(expressions) + "\n}";
     }

@@ -30,7 +30,7 @@ public class ForLoop implements StatementElement {
 
     @Override
     public String toJSONString() {
-        return "{\"ForLoop\": {\n" + identifier.toJSONString() + "," +
+        return "\"ForLoop\": {\n" + identifier.toJSONString() + "," +
                 expression.toJSONString() + "," +
                 "body: " + JSONConvertable.listToJsonString(body) + "}";
     }

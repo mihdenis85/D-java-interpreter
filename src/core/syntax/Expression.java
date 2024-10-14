@@ -19,6 +19,6 @@ public class Expression implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "\"Expression\": " + JSONConvertable.listToJsonString(expressions) + "\n}";
+        return "\"Expression\": " + JSONConvertable.listToJsonString(expressions) + "\n";
     }
 }
