@@ -101,7 +101,6 @@ public class SyntaxAnalyzer {
 
 
     // TODO: Function expression
-    // TODO: Tuple literal
     // TODO: Empty literal for array literal, when element has no value
     private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
@@ -127,11 +126,11 @@ public class SyntaxAnalyzer {
         try {
             AssignmentIdentifier identifier = expectIdentifier();
 
-            if (expectPunct(Code.tkOpenedArrayBracket, 0)) {
+            Token token = peekToken(0);
+            if (token.type == Code.tkOpenedArrayBracket) {
                 skipToken();
 
                 Expression expression = parseExpression();
-                Token token = peekToken(-1);
                 identifier = new ArrayIndex(expression, token.span);
 
                 matchPunct(Code.tkClosedArrayBracket);
@@ -322,6 +321,46 @@ public class SyntaxAnalyzer {
         return array;
     }
 
+    public TupleLiteral parseTuple() throws TokenOutOfIndexException, InvalidIdentifierNameException, UnexpectedTokenException {
+        Token token = peekToken(0);
+        TupleLiteral tuple = new TupleLiteral(new ArrayList<>());
+
+
+        while (token.type != Code.tkClosedTupleBracket) {
+            if (token.type == Code.tkComma) {
+                skipToken();
+                token = peekToken(0);
+                continue;
+            }
+            ArrayList<TupleElement> elements = tuple.getElements();
+
+            Identifier identifier = expectIdentifier();
+
+            Token nextToken = peekToken(0);
+            if (nextToken.type == Code.tkComma) {
+                skipToken();
+                ExpressionElement element = new EmptyLiteral(token.span);
+                Expression expression = new Expression(new ArrayList<>());
+                expression.expressions.add(element);
+                TupleElement tupleElement = new TupleElement(identifier, expression);
+                elements.add(tupleElement);
+                tuple.setElements(elements);
+                token = peekToken(0);
+                continue;
+            }
+
+            matchPunct(Code.tkAssignment);
+
+            Expression element = parseExpression();
+            TupleElement tupleElement = new TupleElement(identifier, element);
+            elements.add(tupleElement);
+            tuple.setElements(elements);
+            token = peekToken(0);
+        }
+
+        skipToken();
+        return tuple;
+    }
     public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         try {
             Token token = getNextToken();
@@ -334,11 +373,28 @@ public class SyntaxAnalyzer {
 
                     yield parseExpression();
                 }
+                case Code.tkOpenedTupleBracket -> {
+                    Token prevToken = peekToken(-2);
+                    if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkPlusSign) {
+                        yield parseTuple();
+                    }
+
+                    yield parseExpression();
+                }
                 case Code.tkIntegerLiteral -> new IntegerLiteral(token.span, token.value);
                 case Code.tkRealLiteral -> new RealLiteral(token.span, token.value);
                 case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
                 case Code.tkBooleanLiteral -> new BooleanLiteral(token.span, token.value);
-                case Code.tkIdentifier -> new Identifier(token.value, token.span);
+                case Code.tkIdentifier -> {
+                    Token nextToken = peekToken(0);
+                    if (nextToken.type == Code.tkDot){
+                        skipToken();
+
+                        yield parseExpressionElement();
+                    }
+
+                    yield new Identifier(token.value, token.span);
+                }
                 case Code.tkPlusSign -> {
                     Token nextToken = peekToken(0);
                     Token prevToken = peekToken(-2);
