@@ -2,10 +2,12 @@ package src.core.expressionElements;
 
 import src.core.Span;
 import src.core.syntax.Expression;
+import src.core.syntax.Identifier;
 import src.core.syntax.interfaces.AssignmentIdentifier;
+import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.JSONConvertable;
 
-public class ArrayIndex implements AssignmentIdentifier, JSONConvertable {
+public class ArrayIndex implements AssignmentIdentifier, ExpressionElement {
     public final Expression expression;
     public final Span span;
 
@@ -16,6 +18,8 @@ public class ArrayIndex implements AssignmentIdentifier, JSONConvertable {
 
     @Override
     public String toJSONString() {
-        return "\"ArrayIndex\": {" + "span: " + span.toString() + ",\n\t" + expression.toJSONString() + "\n}";
+        return "\"ArrayIndex\": {" + "span: " +
+                span.toString() + "," +
+                expression.toJSONString() + "}";
     }
 }

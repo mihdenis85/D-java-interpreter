@@ -386,6 +386,12 @@ public class SyntaxAnalyzer {
             return switch(token.type) {
                 case Code.tkOpenedArrayBracket -> {
                     Token prevToken = peekToken(-2);
+                    if (prevToken.type == Code.tkIdentifier) {
+                        Expression expression = parseExpression();
+                        matchPunct(Code.tkClosedArrayBracket);
+                        yield new ArrayIndex(expression, token.span);
+                    }
+
                     if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkComma || prevToken.type == Code.tkOpenedArrayBracket) {
                         yield parseArray();
                     }
