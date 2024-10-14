@@ -1,1 +1,28 @@
-t[+10 + 30 - 20] := 1;
+var realVar1 := 2.5;
+var realVar2 := 4.245;
+
+var integerVar1 := 3;
+var integerVar2 := 22;
+
+var result;
+
+result := integerVar1 + integerVar2;
+print result is int; // true
+print result; // 25
+
+result := realVar1 + realVar2;
+print result is real; // true
+print result; // 6.745
+
+result := integerVar1 + realVar2;
+print result is real; // true
+print result; // 7.245
+
+result := realVar1 + integerVar2;
+print result is int; // false
+print result; // 24.5
+
+print + integerVar1; // 4
+print - integerVar2; // 21
+print + realVar1; // 3.5
+print - realVar2; // 3.245

@@ -9,4 +9,13 @@ public class Span {
         this.posBegin = posBegin;
         this.posEnd = posEnd;
     }
+
+    @Override
+    public String toString() {
+        return lineNum +
+                ":" +
+                posBegin +
+                "-" +
+                posEnd;
+    }
 }

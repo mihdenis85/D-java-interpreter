@@ -22,11 +22,38 @@ public class Main {
         SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
 
         Program program = syntaxAnalyzer.buildProgram();
-        ArrayList<SyntaxElement> variables = program.getProgram();
 
-        for (SyntaxElement syntaxElement : variables) {
-            System.out.println(syntaxElement);
+        String result = program.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        int tabNumber = 0;
+        for (int i = 0; i < result.length(); i++) {
+            char element = result.charAt(i);
+            if (element == '}' || element == ']') {
+                stringBuilder.append('\n');
+                tabNumber--;
+                stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
+            }
+            stringBuilder.append(element);
+            if (element == '{' || element == '[') {
+                stringBuilder.append('\n');
+                tabNumber++;
+                stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
+            }
+            if (element == ',') {
+                stringBuilder.append('\n');
+                stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
+            }
         }
+        System.out.println(stringBuilder.toString());
+
+
+
+//        ArrayList<SyntaxElement> variables = program.getProgram();
+//
+//        for (SyntaxElement syntaxElement : variables) {
+//            System.out.println(syntaxElement);
+//        }
 
 //        for (int i = 0; i < tokens.size(); i++) {
 //            Token token = tokens.get(i);

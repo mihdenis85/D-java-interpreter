@@ -3,6 +3,7 @@ package src.core.literals;
 import src.core.Span;
 import src.core.enums.Code;
 import src.core.syntax.interfaces.ExpressionElement;
+import src.core.syntax.interfaces.JSONConvertable;
 
 import java.util.HashMap;
 
@@ -18,4 +19,8 @@ public class TupleLiteral extends Literal implements ExpressionElement {
         return elements;
     }
 
+    @Override
+    public String toJSONString() {
+        return "\"TupleLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + ",\n" + "elements: " + JSONConvertable.mapToJsonString(elements) + "\n}";
+    }
 }

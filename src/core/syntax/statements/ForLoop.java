@@ -2,6 +2,7 @@ package src.core.syntax.statements;
 
 import src.core.syntax.Identifier;
 import src.core.syntax.interfaces.ExpressionElement;
+import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 
 import java.util.ArrayList;
@@ -25,5 +26,12 @@ public class ForLoop implements StatementElement {
     }
     public ArrayList<StatementElement> getBody() {
         return body;
+    }
+
+    @Override
+    public String toJSONString() {
+        return "{\"ForLoop\": {\n" + "identifier: " + identifier.toJSONString() + ",\n" +
+                "expression: " + expression.toJSONString() + ",\n" +
+                "body: " + JSONConvertable.listToJsonString(body) + "\n},";
     }
 }

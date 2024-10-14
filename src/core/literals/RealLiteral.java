@@ -15,4 +15,9 @@ public class RealLiteral extends Literal implements ExpressionElement {
     public float getValue() {
         return realValue;
     }
+
+    @Override
+    public String toJSONString() {
+        return "\"RealLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+    }
 }

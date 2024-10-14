@@ -15,4 +15,9 @@ public class BooleanLiteral extends Literal implements ExpressionElement {
     public boolean getValue() {
         return booleanValue;
     }
+
+    @Override
+    public String toJSONString() {
+        return "\"BooleanLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+    }
 }

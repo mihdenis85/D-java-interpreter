@@ -11,4 +11,9 @@ public class MinusSign implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
+
+    @Override
+    public String toJSONString() {
+        return "{\"MinusSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+    }
 }
