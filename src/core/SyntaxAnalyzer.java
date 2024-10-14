@@ -408,7 +408,6 @@ public class SyntaxAnalyzer {
 
                     yield new Identifier(token.value, token.span);
                 }
-                case Code.tkIdentifier -> new Identifier(token.value, token.span);
                 case Code.tkFunction -> analyzeFunctionDeclaration();
                 case Code.tkPlusSign -> {
                     Token nextToken = peekToken(0);
