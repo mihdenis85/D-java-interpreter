@@ -1,16 +1,8 @@
-var sum := func (a, b) is
-  return a + b;
-end;
+// Function that takes a tuple and returns the addition of its elements
+var addTupleElements := func (t) is return t.a + t.b end;
 
-var mult := func (a, b) is
-  return a * b;
-end;
+// Create a tuple
+var exampleTuple := { a:= 3, b := 7 };
 
-var num1 := readInt();
-var num2 := readInt();
-
-if num1 < 0 or num2 < 0 then
-  print mult(num1, num2);
-else
-  print add(num1, num2);
-end;
+// Call the function with the tuple
+print addTupleElements(exampleTuple);  // Should print 10
