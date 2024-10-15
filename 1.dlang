@@ -1,11 +1,16 @@
-var pow := func (base, exponent) is
-  var result := 1;
-  var i := 0;
-  while i < exponent loop
-    result := result * base;
-    i := i + 1;
-  end;
-
+var sum := func (a, b) is
+  return a + b;
 end;
 
-print pow(2, 3); // 8
+var mult := func (a, b) is
+  return a * b;
+end;
+
+var num1 := readInt();
+var num2 := readInt();
+
+if num1 < 0 or num2 < 0 then
+  print mult(num1, num2);
+else
+  print add(num1, num2);
+end;
