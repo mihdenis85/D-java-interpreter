@@ -11,9 +11,4 @@ public class LogicalXor implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"LogicalXor\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
-    }
 }

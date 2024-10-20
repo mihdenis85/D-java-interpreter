@@ -11,9 +11,4 @@ public class MultiplySign implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"MultiplySign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
-    }
 }

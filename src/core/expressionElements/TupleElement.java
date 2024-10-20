@@ -20,9 +20,4 @@ public class TupleElement implements ExpressionElement {
     public Expression getExpression() {
         return expression;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"TupleElement\": {\n" + identifier.toJSONString() + "," + expression.toJSONString() + "}";
-    }
 }

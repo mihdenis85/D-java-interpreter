@@ -9,9 +9,4 @@ public class Literal extends Token implements ExpressionElement {
     public Literal(Span span, Code type, String value) {
         super(span, type, value);
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"Literal\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
-    }
 }

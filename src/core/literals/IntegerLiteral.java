@@ -15,9 +15,4 @@ public class IntegerLiteral extends Literal implements ExpressionElement {
     public int getValue() {
         return intValue;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"IntegerLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
-    }
 }

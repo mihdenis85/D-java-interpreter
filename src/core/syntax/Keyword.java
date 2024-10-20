@@ -1,9 +1,9 @@
 package src.core.syntax;
 
 import src.core.Span;
-import src.core.syntax.interfaces.ExpressionElement;
+import src.core.Token;
 
-public class Keyword implements ExpressionElement {
+public class Keyword {
     private final String value;
     private final Span span;
 
@@ -20,10 +20,5 @@ public class Keyword implements ExpressionElement {
 
     public Span getSpan() {
         return span;
-    }
-
-    @Override
-    public String toJSONString() {
-        return "\"Keyword\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

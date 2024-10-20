@@ -11,9 +11,4 @@ public class TupleType implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"TupleType\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
-    }
 }

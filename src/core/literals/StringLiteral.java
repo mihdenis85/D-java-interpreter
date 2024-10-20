@@ -12,9 +12,4 @@ public class StringLiteral extends Literal implements ExpressionElement {
     public String getValue() {
         return this.value;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"StringLiteral\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
-    }
 }

@@ -11,9 +11,4 @@ public class UnaryNot implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
-
-    @Override
-    public String toJSONString() {
-        return "\"UnaryNot\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
-    }
 }

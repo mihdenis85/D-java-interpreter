@@ -1,7 +1,6 @@
 package src.core.syntax;
 
 import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 
 public class Variable implements StatementElement {
@@ -34,13 +33,5 @@ public class Variable implements StatementElement {
         "\t\t'value': " + keyword.getValue() +
         "\n\t\t'span': " + keyword.getSpan().lineNum + ":" + keyword.getSpan().posBegin + "-" + keyword.getSpan().posEnd +
         "\n\t}\n}";
-    }
-
-    @Override
-    public String toJSONString() {
-        return "\"Variable\": {" +
-                keyword.toJSONString() + "," +
-                identifier.toJSONString() + "," +
-                expression.toJSONString() + "}";
     }
 }
