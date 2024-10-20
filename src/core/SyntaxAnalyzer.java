@@ -101,6 +101,7 @@ public class SyntaxAnalyzer {
 
 
     // TODO: Function expression
+    // TODO: Empty literal for array literal, when element has no value
     private StatementElement parseStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token peek = peekToken(0);
         return switch (peek.type) {
@@ -332,22 +333,21 @@ public class SyntaxAnalyzer {
                 continue;
             }
             ArrayList<TupleElement> elements = tuple.getElements();
-            Token nextToken = peekToken(1);
-            Identifier identifier = new Identifier("", nextToken.span);
 
-            if (token.type == Code.tkIdentifier) {
-                identifier = expectIdentifier();
-            }
+            Identifier identifier = expectIdentifier();
 
+            Token nextToken = peekToken(0);
             if (nextToken.type == Code.tkComma) {
-                Expression expression = parseExpression();
+                skipToken();
+                ExpressionElement element = new EmptyLiteral(token.span);
+                Expression expression = new Expression(new ArrayList<>());
+                expression.expressions.add(element);
                 TupleElement tupleElement = new TupleElement(identifier, expression);
                 elements.add(tupleElement);
                 tuple.setElements(elements);
                 token = peekToken(0);
                 continue;
             }
-
 
             matchPunct(Code.tkAssignment);
 
