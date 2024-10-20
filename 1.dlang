@@ -1,11 +1,5 @@
-var pow := func (base, exponent) is
-  var result := 1;
-  var i := 0;
-  while i < exponent loop
-    result := result * base;
-    i := i + 1;
-  end;
-
+var add := func (a, b) is
+    return a + b;
 end;
 
-print pow(2, 3); // 8
+print add(3, 5); // Should print 8

@@ -352,21 +352,22 @@ public class SyntaxAnalyzer {
                 continue;
             }
             ArrayList<TupleElement> elements = tuple.getElements();
+            Token nextToken = peekToken(1);
+            Identifier identifier = new Identifier("", nextToken.span);
 
-            Identifier identifier = expectIdentifier();
+            if (token.type == Code.tkIdentifier) {
+                identifier = expectIdentifier();
+            }
 
-            Token nextToken = peekToken(0);
             if (nextToken.type == Code.tkComma) {
-                skipToken();
-                ExpressionElement element = new EmptyLiteral(token.span);
-                Expression expression = new Expression(new ArrayList<>());
-                expression.expressions.add(element);
+                Expression expression = parseExpression();
                 TupleElement tupleElement = new TupleElement(identifier, expression);
                 elements.add(tupleElement);
                 tuple.setElements(elements);
                 token = peekToken(0);
                 continue;
             }
+
 
             matchPunct(Code.tkAssignment);
 
