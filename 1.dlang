@@ -1,2 +1,11 @@
-var myTuple := { x := 5, y, z := 10 }; // 'y' is a pair without a value
-//print myTuple.x, myTuple.2, myTuple.z; // Should print 5, y, 10
+var pow := func (base, exponent) is
+  var result := 1;
+  var i := 0;
+  while i < exponent loop
+    result := result * base;
+    i := i + 1;
+  end;
+
+end;
+
+print pow(2, 3); // 8

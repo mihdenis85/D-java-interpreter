@@ -3,6 +3,7 @@ package src.core.syntax.statements;
 import src.core.Span;
 import src.core.syntax.Expression;
 import src.core.syntax.interfaces.ExpressionElement;
+import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 
 import java.util.ArrayList;
@@ -23,5 +24,11 @@ public class PrintStatement implements StatementElement {
 
     public Span getSpan() {
         return span;
+    }
+
+    @Override
+    public String toJSONString() {
+        return "\"PrintStatement\": {" + "Expressions: " + JSONConvertable.listToJsonString(expressions) + "," +
+                "Span: " + span.toString() + "}";
     }
 }

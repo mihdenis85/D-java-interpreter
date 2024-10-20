@@ -19,4 +19,9 @@ public class EmptyLiteral implements ExpressionElement {
     public Integer getValue() {
         return value;
     }
+
+    @Override
+    public String toJSONString() {
+        return "\"EmptyLiteral\": {\n" + "value: " + "null" + ",\n" + "span: " + span.toString() + "\n}";
+    }
 }

@@ -11,4 +11,9 @@ public class PlusSign implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
+
+    @Override
+    public String toJSONString() {
+        return "\"PlusSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+    }
 }

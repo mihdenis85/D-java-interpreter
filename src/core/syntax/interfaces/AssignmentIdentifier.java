@@ -1,4 +1,4 @@
 package src.core.syntax.interfaces;
 
-public interface AssignmentIdentifier {
+public interface AssignmentIdentifier extends JSONConvertable {
 }

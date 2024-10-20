@@ -5,6 +5,7 @@ import src.core.Span;
 import src.core.Token;
 import src.core.syntax.Expression;
 import src.core.syntax.interfaces.ExpressionElement;
+import src.core.syntax.interfaces.JSONConvertable;
 
 import java.util.ArrayList;
 
@@ -31,5 +32,10 @@ public class ArrayLiteral implements ExpressionElement {
 
     public Expression getExpressionByIndex(int index) {
         return elements.get(index + 1);
+    }
+
+    @Override
+    public String toJSONString() {
+        return "\"ArrayLiteral\": {\n" + "elements: " + JSONConvertable.listToJsonString(elements) + "\n}";
     }
 }

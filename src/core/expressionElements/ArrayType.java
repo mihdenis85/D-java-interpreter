@@ -11,4 +11,9 @@ public class ArrayType implements ExpressionElement {
         this.value = value;
         this.span = span;
     }
+
+    @Override
+    public String toJSONString() {
+        return "\"ArrayType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
+    }
 }

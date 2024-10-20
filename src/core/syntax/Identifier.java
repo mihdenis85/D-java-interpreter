@@ -23,4 +23,9 @@ public class Identifier extends Token implements ExpressionElement, AssignmentId
     public Span getSpan() {
         return span;
     }
+
+    @Override
+    public String toJSONString() {
+        return "\"Identifier\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
+    }
 }

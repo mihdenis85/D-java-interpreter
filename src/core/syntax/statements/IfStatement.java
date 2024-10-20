@@ -1,6 +1,7 @@
 package src.core.syntax.statements;
 
 import src.core.syntax.Expression;
+import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 
 import java.util.ArrayList;
@@ -26,5 +27,12 @@ public class IfStatement implements StatementElement {
 
     public ArrayList<StatementElement> getElseBody() {
         return elseStatementBody;
+    }
+
+    @Override
+    public String toJSONString() {
+        return "\"IfStatement\": {" + condition.toJSONString() + "," +
+                "statementBody: " + JSONConvertable.listToJsonString(statementBody) + "," +
+                "elseBody: " + JSONConvertable.listToJsonString(elseStatementBody) + "}";
     }
 }
