@@ -359,7 +359,7 @@ public class SyntaxAnalyzer {
                 identifier = expectIdentifier();
             }
 
-            if (nextToken.type == Code.tkComma) {
+            if (nextToken.type == Code.tkComma || nextToken.type == Code.tkClosedTupleBracket) {
                 Expression expression = parseExpression();
                 TupleElement tupleElement = new TupleElement(identifier, expression);
                 elements.add(tupleElement);
