@@ -157,11 +157,17 @@ public class SyntaxAnalyzer {
         try {
             matchPunct(Code.tkOpenedBracket);
             ArrayList<ExpressionElement> arguments = parseArguments();
+            ArrayList<StatementElement> body = new ArrayList<>();
 
             matchPunct(Code.tkClosedBracket);
-            matchKeyword(Code.tkIs);
-            ArrayList<StatementElement> body = parseBody();
-            matchKeyword(Code.tkEnd);
+            if (expectKeyword(Code.tkIs, 0)) {
+                matchKeyword(Code.tkIs);
+                body = parseBody();
+                matchKeyword(Code.tkEnd);
+            }
+            if (expectKeyword(Code.tkArrowFunctionSign, 0)) {
+                body.add(analyzeArrowFuncReturnStatement());
+            }
 
             return new FunctionStatement(arguments, body);
         } catch (Exception e) {
@@ -211,6 +217,19 @@ public class SyntaxAnalyzer {
         }
 
         matchPunct(Code.tkSemicolon);
+
+        return new ReturnStatement(returnValue, token.span);
+    }
+
+    private StatementElement analyzeArrowFuncReturnStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
+        Token token = peekToken(0);
+
+        matchPunct(Code.tkArrowFunctionSign);
+
+        Expression returnValue = null;
+        if (hasNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
+            returnValue = parseExpression();
+        }
 
         return new ReturnStatement(returnValue, token.span);
     }
@@ -304,10 +323,12 @@ public class SyntaxAnalyzer {
 
         expressions.add(parseExpressionElement());
 
-        token = peekToken(0);
-        while (!ExpressionStopper.contains(token.type)) {
-            expressions.add(parseExpressionElement());
+        if (hasNextToken()) {
             token = peekToken(0);
+            while (!ExpressionStopper.contains(token.type)) {
+                expressions.add(parseExpressionElement());
+                token = peekToken(0);
+            }
         }
 
         return new Expression(expressions);
