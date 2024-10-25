@@ -9,9 +9,11 @@ import src.core.syntax.interfaces.JSONConvertable;
 
 public class ArrayIndex implements AssignmentIdentifier, ExpressionElement {
     public final Expression expression;
+    public final Identifier identifier;
     public final Span span;
 
-    public ArrayIndex(Expression expression, Span span) {
+    public ArrayIndex(Expression expression, Identifier identifier, Span span) {
+        this.identifier = identifier;
         this.expression = expression;
         this.span = span;
     }
@@ -20,6 +22,7 @@ public class ArrayIndex implements AssignmentIdentifier, ExpressionElement {
     public String toJSONString() {
         return "\"ArrayIndex\": {" + "span: " +
                 span.toString() + "," +
-                expression.toJSONString() + "}";
+                expression.toJSONString() + "," +
+                identifier.toJSONString() + "}";
     }
 }

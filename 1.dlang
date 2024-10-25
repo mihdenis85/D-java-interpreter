@@ -1,11 +1,8 @@
-var pow := func (base, exponent) is
-  var result := 1;
-  var i := 0;
-  while i < exponent loop
-    result := result * base;
-    i := i + 1;
-  end;
+// Function that takes a tuple and returns the addition of its elements
+var addTupleElements := func (t) => t.1 + t.2;
 
-end;
+// Create a tuple
+var exampleTuple := { 3, 7 };
 
-print pow(2, 3); // 8
+// Call the function with the tuple
+print addTupleElements(exampleTuple);  // Should print 10
