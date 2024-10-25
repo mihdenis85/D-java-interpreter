@@ -391,7 +391,7 @@ public class SyntaxAnalyzer {
                         Expression expression = parseExpression();
                         matchPunct(Code.tkClosedArrayBracket);
                         Identifier identifier = new Identifier(prevToken.value, prevToken.span);
-                        yield new ArrayIndex(expression, 2identifier, token.span);
+                        yield new ArrayIndex(expression, identifier, token.span);
                     }
 
                     if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkComma || prevToken.type == Code.tkOpenedArrayBracket) {
