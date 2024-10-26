@@ -132,7 +132,7 @@ public class SyntaxAnalyzer {
             if (token.type == Code.tkOpenedBracket) {
                 skipToken();
 
-                ArrayList<ExpressionElement> arguments = parseArguments();
+                ArrayList<ExpressionElement> arguments = parseCallArguments();
                 matchPunct(Code.tkClosedBracket);
                 matchPunct(Code.tkSemicolon);
                 return new FunctionCall(identifier, arguments);
@@ -156,7 +156,7 @@ public class SyntaxAnalyzer {
     private ExpressionElement analyzeFunctionDeclaration() {
         try {
             matchPunct(Code.tkOpenedBracket);
-            ArrayList<ExpressionElement> arguments = parseArguments();
+            ArrayList<Identifier> arguments = parseStatementArguments();
             ArrayList<StatementElement> body = new ArrayList<>();
 
             matchPunct(Code.tkClosedBracket);
@@ -444,7 +444,7 @@ public class SyntaxAnalyzer {
                     if (nextToken.type == Code.tkOpenedBracket) {
                         Identifier identifier = new Identifier(token.value, token.span);
                         skipToken();
-                        ArrayList<ExpressionElement> arguments = parseArguments();
+                        ArrayList<ExpressionElement> arguments = parseCallArguments();
                         matchPunct(Code.tkClosedBracket);
                         yield new FunctionCall(identifier, arguments);
                     }
@@ -500,7 +500,7 @@ public class SyntaxAnalyzer {
         return null;
     }
 
-    private ArrayList<ExpressionElement> parseArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+    private ArrayList<ExpressionElement> parseCallArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         ArrayList<ExpressionElement> arguments = new ArrayList<>();
 
         if (!expectPunct(Code.tkClosedBracket, 0)) {
@@ -515,6 +515,23 @@ public class SyntaxAnalyzer {
 
         return arguments;
     }
+    private ArrayList<Identifier> parseStatementArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+        ArrayList<Identifier> arguments = new ArrayList<>();
+
+        if (!expectPunct(Code.tkClosedBracket, 0)) {
+            Token argument = getNextToken();
+            arguments.add(new Identifier(argument.value, argument.span));
+
+            while (expectPunct(Code.tkComma, 0)) {
+                skipToken();
+                argument = getNextToken();
+                arguments.add(new Identifier(argument.value, argument.span));
+            }
+        }
+
+        return arguments;
+    }
+
 
     private ArrayList<StatementElement> parseBody() throws UnexpectedTokenException, TokenOutOfIndexException {
         ArrayList<StatementElement> body = new ArrayList<>();
