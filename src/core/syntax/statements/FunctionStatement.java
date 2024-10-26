@@ -5,7 +5,7 @@ import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 import java.util.ArrayList;
 
-public class FunctionStatement implements ExpressionElement {
+public class FunctionStatement implements ExpressionElement, StatementElement {
     private final ArrayList<Identifier> arguments;
     private final ArrayList<StatementElement> body;
 

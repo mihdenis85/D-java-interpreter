@@ -1,16 +1,17 @@
 package src.core.syntax.statements;
 
 import src.core.Span;
+import src.core.syntax.Expression;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 import java.util.Optional;
 
 public class ReturnStatement implements StatementElement {
-    private final ExpressionElement returnValue;
+    private final Expression returnValue;
     private final Span span;
 
-    public ReturnStatement(ExpressionElement returnValue, Span span) {
+    public ReturnStatement(Expression returnValue, Span span) {
         this.returnValue = returnValue;
         this.span = span;
     }
@@ -19,6 +20,10 @@ public class ReturnStatement implements StatementElement {
         return Optional.ofNullable(returnValue);
     }
 
+    public Expression getExpression() {
+        return this.returnValue;
+    }
+    
     public Span getSpan() {
         return span;
     }
