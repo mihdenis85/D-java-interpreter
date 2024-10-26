@@ -1,8 +1,5 @@
-// Function that takes a tuple and returns the addition of its elements
-var addTupleElements := func (t) => t.1 + t.2;
+var add := func (a, b) is
+    return a + b;
+end;
 
-// Create a tuple
-var exampleTuple := { 3, 7 };
-
-// Call the function with the tuple
-print addTupleElements(exampleTuple);  // Should print 10
+print add(3, 5); // Should print 8
