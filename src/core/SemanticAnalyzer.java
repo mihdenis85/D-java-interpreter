@@ -95,6 +95,8 @@ public class SemanticAnalyzer {
         }
 
         if (syntaxElement instanceof ForLoop forLoop) {
+            this.definedVariables.put(forLoop.getIdentifier().getValue(), 0);
+
             ArrayList<ExpressionElement> expressions = new ArrayList<>();
             expressions.add(forLoop.getExpression());
 
