@@ -1,5 +1,5 @@
-var add := func (a, b) is
-    return a + b;
-end;
+var realVar1 := 2.5;
+var realVar2 := 4.245;
 
-print add(3, 5); // Should print 8
+var integerVar1 := 3;
+var integerVar2 := 22;
