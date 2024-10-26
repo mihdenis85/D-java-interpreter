@@ -1,5 +1,5 @@
-var realVar1 := 2.5;
-var realVar2 := 4.245;
+var add := func (a, b) is
+    return a + b;
+end;
 
-var integerVar1 := 3;
-var integerVar2 := 22;
+add(test1, 2);

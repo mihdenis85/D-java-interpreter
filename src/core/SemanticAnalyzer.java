@@ -7,6 +7,7 @@ import src.core.syntax.Expression;
 import src.core.syntax.Identifier;
 import src.core.syntax.Program;
 import src.core.syntax.Variable;
+import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.interfaces.SyntaxElement;
@@ -15,7 +16,6 @@ import src.core.syntax.statements.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class SemanticAnalyzer {
     private final ArrayList<SyntaxElement> tree;
@@ -89,7 +89,29 @@ public class SemanticAnalyzer {
         }
 
         if (syntaxElement instanceof FunctionStatement functionStatement) {
+            ArrayList<ExpressionElement> expressions = functionStatement.getArguments();
+            for (ExpressionElement argument : expressions) {
+                if (argument instanceof Expression ex) {
+                    ArrayList<ExpressionElement> arguments = ex.getExpressions();
+                    for (ExpressionElement arg : arguments) {
+                        if (arg instanceof Identifier id) {
+                            definedVariables.put(id.getValue(), true);
+                        }
+                    }
+                }
+            }
+
             parseBody(functionStatement.getBody());
+        }
+
+        if (syntaxElement instanceof FunctionCall functionCall) {
+            AssignmentIdentifier identifier = functionCall.getIdentifier();
+            if (identifier instanceof Identifier id) {
+                if (definedVariables.get(id.getValue()) == null) {
+                    throw new Error("Variable '" + id.getValue() + "' is not defined");
+                }
+            }
+            analyzeExpression(functionCall.getArguments());
         }
 
         if (syntaxElement instanceof AssignmentStatement assignmentStatement) {
@@ -101,12 +123,15 @@ public class SemanticAnalyzer {
 
     public void analyzeExpression(ArrayList<ExpressionElement> expressions) {
         for (ExpressionElement expressionElement : expressions) {
-            System.out.println(expressionElement);
             if (expressionElement instanceof Identifier identifier) {
                 if (definedVariables.get(identifier.getValue()) == null) {
                     throw new Error("Variable '" + identifier.getValue() + "' is not defined");
                 }
             };
+
+            if (expressionElement instanceof Expression expression) {
+                analyzeExpression(expression.getExpressions());
+            }
 
             if (expressionElement instanceof TupleLiteral tupleLiteral) {
                 for (TupleElement tupleElement : tupleLiteral.getElements()) {
