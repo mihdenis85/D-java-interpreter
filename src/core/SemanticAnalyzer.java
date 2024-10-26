@@ -16,10 +16,11 @@ import src.core.syntax.statements.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SemanticAnalyzer {
     private final ArrayList<SyntaxElement> tree;
-    private final Map<String, Boolean> definedVariables;
+    private final Map<String, Integer> definedVariables;
 
     public SemanticAnalyzer(ArrayList<SyntaxElement> tree) {
         this.tree = tree;
@@ -43,8 +44,22 @@ public class SemanticAnalyzer {
     public void parseStatement(SyntaxElement syntaxElement) {
         if (syntaxElement instanceof Variable variable) {
             String identifier = variable.getIdentifier().getValue();
-            definedVariables.put(identifier, true);
+            definedVariables.put(identifier, 0);
             Expression expression = variable.getExpression();
+
+            if (expression.getExpressions().getFirst() instanceof FunctionStatement functionStatement) {
+                definedVariables.put(identifier, functionStatement.getArguments().size());
+            }
+
+            if (expression.getExpressions().getFirst() instanceof FunctionCall functionCall) {
+                if (functionCall.getIdentifier() instanceof Identifier id) {
+                    if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
+                        if (!definedVariables.containsKey(id.getValue())) {
+                            throw new Error("Function '" + id.getValue() + "' is not defined");
+                        }
+                    }
+                }
+            }
 
             analyzeExpression(expression.getExpressions());
         }
@@ -95,7 +110,7 @@ public class SemanticAnalyzer {
                     ArrayList<ExpressionElement> arguments = ex.getExpressions();
                     for (ExpressionElement arg : arguments) {
                         if (arg instanceof Identifier id) {
-                            definedVariables.put(id.getValue(), true);
+                            definedVariables.put(id.getValue(), 0);
                         }
                     }
                 }
@@ -105,13 +120,20 @@ public class SemanticAnalyzer {
         }
 
         if (syntaxElement instanceof FunctionCall functionCall) {
+            System.out.println(definedVariables);
             AssignmentIdentifier identifier = functionCall.getIdentifier();
+            ArrayList<ExpressionElement> arguments = functionCall.getArguments();
             if (identifier instanceof Identifier id) {
                 if (definedVariables.get(id.getValue()) == null) {
                     throw new Error("Variable '" + id.getValue() + "' is not defined");
                 }
+
+                if (definedVariables.get(id.getValue()) != arguments.size()) {
+                    throw new Error("Function '" + id.getValue() + "' has different number of arguments");
+                }
             }
-            analyzeExpression(functionCall.getArguments());
+
+            analyzeExpression(arguments);
         }
 
         if (syntaxElement instanceof AssignmentStatement assignmentStatement) {

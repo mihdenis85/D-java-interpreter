@@ -1,5 +1,1 @@
-var add := func (a, b) is
-    return a + b;
-end;
-
-add(test1, 2);
+var a := readInt();
