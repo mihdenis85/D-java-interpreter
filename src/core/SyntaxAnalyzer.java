@@ -125,7 +125,7 @@ public class SyntaxAnalyzer {
                 skipToken();
 
                 Expression expression = parseExpression();
-                identifier = new ArrayIndex(expression, token.span);
+                identifier = new ArrayIndex(expression, (Identifier) identifier, token.span);
 
                 matchPunct(Code.tkClosedArrayBracket);
             }
@@ -412,7 +412,8 @@ public class SyntaxAnalyzer {
                     if (prevToken.type == Code.tkIdentifier) {
                         Expression expression = parseExpression();
                         matchPunct(Code.tkClosedArrayBracket);
-                        yield new ArrayIndex(expression, token.span);
+                        Identifier identifier = new Identifier(prevToken.value, prevToken.span);
+                        yield new ArrayIndex(expression, identifier, token.span);
                     }
 
                     if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkComma || prevToken.type == Code.tkOpenedArrayBracket) {
