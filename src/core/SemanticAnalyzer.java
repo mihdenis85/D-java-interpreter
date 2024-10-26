@@ -104,16 +104,9 @@ public class SemanticAnalyzer {
         }
 
         if (syntaxElement instanceof FunctionStatement functionStatement) {
-            ArrayList<ExpressionElement> expressions = functionStatement.getArguments();
-            for (ExpressionElement argument : expressions) {
-                if (argument instanceof Expression ex) {
-                    ArrayList<ExpressionElement> arguments = ex.getExpressions();
-                    for (ExpressionElement arg : arguments) {
-                        if (arg instanceof Identifier id) {
-                            definedVariables.put(id.getValue(), 0);
-                        }
-                    }
-                }
+            ArrayList<Identifier> arguments = functionStatement.getArguments();
+            for (Identifier argument : arguments) {
+                definedVariables.put(argument.getValue(), 0);
             }
 
             parseBody(functionStatement.getBody());
