@@ -24,35 +24,35 @@ public class Main {
         Program program = syntaxAnalyzer.buildProgram();
 
         SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
-        semanticAnalyzer.analyze();
+        Program updatedProgram = semanticAnalyzer.analyze();
 
-//        try {
-//            String result = program.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
-//
-//            StringBuilder stringBuilder = new StringBuilder();
-//            int tabNumber = 0;
-//            for (int i = 0; i < result.length(); i++) {
-//                char element = result.charAt(i);
-//                if (element == '}' || element == ']') {
-//                    stringBuilder.append('\n');
-//                    tabNumber--;
-//                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
-//                }
-//                stringBuilder.append(element);
-//                if (element == '{' || element == '[') {
-//                    stringBuilder.append('\n');
-//                    tabNumber++;
-//                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
-//                }
-//                if (element == ',') {
-//                    stringBuilder.append('\n');
-//                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
-//                }
-//            }
-//            System.out.println(stringBuilder.toString());
-//        } catch (Exception e) {
-//            System.exit(0);
-//        }
+        try {
+            String result = updatedProgram.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
+
+            StringBuilder stringBuilder = new StringBuilder();
+            int tabNumber = 0;
+            for (int i = 0; i < result.length(); i++) {
+                char element = result.charAt(i);
+                if (element == '}' || element == ']') {
+                    stringBuilder.append('\n');
+                    tabNumber--;
+                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
+                }
+                stringBuilder.append(element);
+                if (element == '{' || element == '[') {
+                    stringBuilder.append('\n');
+                    tabNumber++;
+                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
+                }
+                if (element == ',') {
+                    stringBuilder.append('\n');
+                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
+                }
+            }
+            System.out.println(stringBuilder.toString());
+        } catch (Exception e) {
+            System.exit(0);
+        }
 
 
 

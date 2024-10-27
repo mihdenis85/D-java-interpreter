@@ -1,5 +1,7 @@
 package src.core;
 
+import org.w3c.dom.ls.LSOutput;
+import src.core.expressionElements.BooleanType;
 import src.core.expressionElements.TupleElement;
 import src.core.literals.ArrayLiteral;
 import src.core.literals.TupleLiteral;
@@ -19,12 +21,24 @@ import java.util.Map;
 import java.util.Objects;
 
 public class SemanticAnalyzer {
-    private final ArrayList<SyntaxElement> tree;
+    private ArrayList<StatementElement> tree;
     private final Map<String, Integer> definedVariables;
+    private final ArrayList<String> usedVariables;
+    private boolean isVariableChecking;
+    private boolean isEmptyCasesChecking;
+    private ArrayList<StatementElement> bodyToCheck;
+    private ArrayList<StatementElement> parentBody;
+    private ExpressionElement currentExpression;
+    private Variable functionVariable;
+    private boolean isDeleted;
 
-    public SemanticAnalyzer(ArrayList<SyntaxElement> tree) {
+    public SemanticAnalyzer(ArrayList<StatementElement> tree) {
         this.tree = tree;
         this.definedVariables = new HashMap<>();
+        this.usedVariables = new ArrayList<>();
+        this.isVariableChecking = false;
+        this.isEmptyCasesChecking = false;
+        this.isDeleted = false;
     }
 
     public Program analyze() {
@@ -32,29 +46,68 @@ public class SemanticAnalyzer {
             parseStatement(syntaxElement);
         }
 
+        this.isVariableChecking = true;
+        int counter = 0;
+
+        while (counter < tree.size()) {
+            this.bodyToCheck = tree;
+            this.isDeleted = false;
+            parseStatement(tree.get(counter));
+            if (!this.isDeleted) {
+                counter++;
+            }
+        }
+
+        this.isEmptyCasesChecking = true;
+
+        counter = 0;
+        while (counter < tree.size()) {
+            this.parentBody = tree;
+            this.isDeleted = false;
+            parseStatement(tree.get(counter));
+            if (!this.isDeleted) {
+                counter++;
+            }
+        }
+
+
         return new Program(tree);
     }
 
     public void parseBody(ArrayList<StatementElement> body) {
-        for (SyntaxElement syntaxElement : body) {
-            parseStatement(syntaxElement);
+        this.bodyToCheck = body;
+        int counter = 0;
+        while (counter < body.size()) {
+            this.parentBody = body;
+            this.isDeleted = false;
+            parseStatement(body.get(counter));
+            if (!this.isDeleted) {
+                counter++;
+            }
         }
     }
 
     public void parseStatement(SyntaxElement syntaxElement) {
         if (syntaxElement instanceof Variable variable) {
             String identifier = variable.getIdentifier().getValue();
+            if (!usedVariables.contains(identifier) && isVariableChecking) {
+                this.bodyToCheck.remove(variable);
+                this.isDeleted = true;
+                this.definedVariables.remove(identifier);
+            }
+
             definedVariables.put(identifier, 0);
             Expression expression = variable.getExpression();
 
             if (expression.getExpressions().getFirst() instanceof FunctionStatement functionStatement) {
+                this.functionVariable = variable;
                 definedVariables.put(identifier, functionStatement.getArguments().size());
             }
 
             if (expression.getExpressions().getFirst() instanceof FunctionCall functionCall) {
                 if (functionCall.getIdentifier() instanceof Identifier id) {
                     if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
-                        if (!definedVariables.containsKey(id.getValue())) {
+                        if (!definedVariables.containsKey(id.getValue()) && !(currentExpression instanceof TupleLiteral)) {
                             throw new Error("Function '" + id.getValue() + "' is not defined");
                         }
                     }
@@ -69,7 +122,16 @@ public class SemanticAnalyzer {
 
             analyzeExpression(condition.getExpressions());
 
+            ArrayList<StatementElement> body = ifStatement.getBody();
+
             parseBody(ifStatement.getBody());
+
+            bodyToCheck = ifStatement.getElseBody();
+            if (body.isEmpty() && bodyToCheck.isEmpty() && isEmptyCasesChecking) {
+                System.out.println(parentBody);
+                parentBody.remove(ifStatement);
+                return;
+            }
 
             parseBody(ifStatement.getElseBody());
         }
@@ -92,6 +154,12 @@ public class SemanticAnalyzer {
             analyzeExpression(condition.getExpressions());
 
             parseBody(whileLoop.getBody());
+
+            bodyToCheck = whileLoop.getBody();
+
+            if (bodyToCheck.isEmpty() && isEmptyCasesChecking) {
+                this.parentBody.remove(whileLoop);
+            }
         }
 
         if (syntaxElement instanceof ForLoop forLoop) {
@@ -103,6 +171,12 @@ public class SemanticAnalyzer {
             analyzeExpression(expressions);
 
             parseBody(forLoop.getBody());
+
+            bodyToCheck = forLoop.getBody();
+
+            if (bodyToCheck.isEmpty() && isEmptyCasesChecking) {
+                this.parentBody.remove(forLoop);
+            }
         }
 
         if (syntaxElement instanceof FunctionStatement functionStatement) {
@@ -112,19 +186,35 @@ public class SemanticAnalyzer {
             }
 
             parseBody(functionStatement.getBody());
+
+            bodyToCheck = functionStatement.getBody();
+
+            if (bodyToCheck.isEmpty() && isEmptyCasesChecking) {
+                this.parentBody.remove(functionVariable);
+                this.isDeleted = true;
+                this.definedVariables.remove(functionVariable.getIdentifier().getValue());
+            }
         }
 
         if (syntaxElement instanceof FunctionCall functionCall) {
-            System.out.println(definedVariables);
             AssignmentIdentifier identifier = functionCall.getIdentifier();
             ArrayList<ExpressionElement> arguments = functionCall.getArguments();
             if (identifier instanceof Identifier id) {
-                if (definedVariables.get(id.getValue()) == null) {
-                    throw new Error("Variable '" + id.getValue() + "' is not defined");
+                if (definedVariables.get(id.getValue()) == null && isVariableChecking) {
+                    this.parentBody.remove(functionCall);
+                    return;
                 }
 
-                if (definedVariables.get(id.getValue()) != arguments.size()) {
-                    throw new Error("Function '" + id.getValue() + "' has different number of arguments");
+                if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
+                    if (definedVariables.get(id.getValue()) == null) {
+                        throw new Error("Variable '" + id.getValue() + "' is not defined");
+                    } else {
+                        usedVariables.add(id.getValue());
+                    }
+
+                    if (definedVariables.get(id.getValue()) != arguments.size()) {
+                        throw new Error("Function '" + id.getValue() + "' has different number of arguments");
+                    }
                 }
             }
 
@@ -132,6 +222,13 @@ public class SemanticAnalyzer {
         }
 
         if (syntaxElement instanceof AssignmentStatement assignmentStatement) {
+            AssignmentIdentifier identifier = assignmentStatement.getIdentifier();
+            if (identifier instanceof Identifier id) {
+                if (definedVariables.get(id.getValue()) == null) {
+                    throw new Error("Variable '" + id.getValue() + "' is not defined");
+                }
+            }
+
             Expression expression = assignmentStatement.getExpression();
 
             analyzeExpression(expression.getExpressions());
@@ -140,9 +237,12 @@ public class SemanticAnalyzer {
 
     public void analyzeExpression(ArrayList<ExpressionElement> expressions) {
         for (ExpressionElement expressionElement : expressions) {
+            currentExpression = expressionElement;
             if (expressionElement instanceof Identifier identifier) {
                 if (definedVariables.get(identifier.getValue()) == null) {
                     throw new Error("Variable '" + identifier.getValue() + "' is not defined");
+                } else {
+                    usedVariables.add(identifier.getValue());
                 }
             };
 
@@ -164,6 +264,10 @@ public class SemanticAnalyzer {
 
             if (expressionElement instanceof FunctionStatement function) {
                 parseStatement(function);
+            }
+
+            if (expressionElement instanceof FunctionCall functionCall) {
+                parseStatement(functionCall);
             }
         }
     }
