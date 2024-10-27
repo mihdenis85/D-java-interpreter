@@ -82,7 +82,7 @@ public class SyntaxAnalyzer {
     }
 
     public Program buildProgram() {
-        ArrayList<SyntaxElement> syntaxElements = new ArrayList<>();
+        ArrayList<StatementElement> syntaxElements = new ArrayList<>();
 
         try {
             while (currentTokenIndex < tokensList.size()) {

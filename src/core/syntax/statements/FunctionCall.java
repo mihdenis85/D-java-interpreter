@@ -27,7 +27,6 @@ public class FunctionCall implements ExpressionElement, StatementElement {
     @Override
     public String toJSONString() {
         return "\"FunctionCall\": {" + identifier.toJSONString() + "," +
-                identifier.toJSONString() + "," +
                 "Arguments: " + JSONConvertable.listToJsonString(arguments) + "}";
     }
 }
