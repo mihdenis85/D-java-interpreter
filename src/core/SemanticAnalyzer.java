@@ -30,6 +30,7 @@ public class SemanticAnalyzer {
     private ArrayList<StatementElement> parentBody;
     private ExpressionElement currentExpression;
     private Variable functionVariable;
+    private boolean isTuple;
     private boolean isDeleted;
 
     public SemanticAnalyzer(ArrayList<StatementElement> tree) {
@@ -39,6 +40,7 @@ public class SemanticAnalyzer {
         this.isVariableChecking = false;
         this.isEmptyCasesChecking = false;
         this.isDeleted = false;
+        this.isTuple = false;
     }
 
     public Program analyze() {
@@ -239,7 +241,7 @@ public class SemanticAnalyzer {
         for (ExpressionElement expressionElement : expressions) {
             currentExpression = expressionElement;
             if (expressionElement instanceof Identifier identifier) {
-                if (definedVariables.get(identifier.getValue()) == null) {
+                if (definedVariables.get(identifier.getValue()) == null && !isTuple) {
                     throw new Error("Variable '" + identifier.getValue() + "' is not defined");
                 } else {
                     usedVariables.add(identifier.getValue());
@@ -251,9 +253,11 @@ public class SemanticAnalyzer {
             }
 
             if (expressionElement instanceof TupleLiteral tupleLiteral) {
+                this.isTuple = true;
                 for (TupleElement tupleElement : tupleLiteral.getElements()) {
                     analyzeExpression(tupleElement.getExpression().getExpressions());
                 }
+                this.isTuple = false;
             }
 
             if (expressionElement instanceof ArrayLiteral arrayLiteral) {
