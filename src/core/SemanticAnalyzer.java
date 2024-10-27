@@ -1,7 +1,8 @@
 package src.core;
 
-import org.w3c.dom.ls.LSOutput;
-import src.core.expressionElements.BooleanType;
+import src.core.exceptions.InvalidArgumentsCountException;
+import src.core.exceptions.UndefinedFunctionException;
+import src.core.exceptions.UndefinedVariableException;
 import src.core.expressionElements.TupleElement;
 import src.core.literals.ArrayLiteral;
 import src.core.literals.TupleLiteral;
@@ -110,7 +111,7 @@ public class SemanticAnalyzer {
                 if (functionCall.getIdentifier() instanceof Identifier id) {
                     if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
                         if (!definedVariables.containsKey(id.getValue()) && !(currentExpression instanceof TupleLiteral)) {
-                            throw new Error("Function '" + id.getValue() + "' is not defined");
+                            throw new UndefinedFunctionException(id.getValue(), id.getSpan());
                         }
                     }
                 }
@@ -130,7 +131,6 @@ public class SemanticAnalyzer {
 
             bodyToCheck = ifStatement.getElseBody();
             if (body.isEmpty() && bodyToCheck.isEmpty() && isEmptyCasesChecking) {
-                System.out.println(parentBody);
                 parentBody.remove(ifStatement);
                 return;
             }
@@ -202,20 +202,22 @@ public class SemanticAnalyzer {
             AssignmentIdentifier identifier = functionCall.getIdentifier();
             ArrayList<ExpressionElement> arguments = functionCall.getArguments();
             if (identifier instanceof Identifier id) {
-                if (definedVariables.get(id.getValue()) == null && isVariableChecking) {
-                    this.parentBody.remove(functionCall);
-                    return;
+                if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
+                    if (definedVariables.get(id.getValue()) == null && isVariableChecking) {
+                        this.parentBody.remove(functionCall);
+                        return;
+                    }
                 }
 
                 if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
                     if (definedVariables.get(id.getValue()) == null) {
-                        throw new Error("Variable '" + id.getValue() + "' is not defined");
+                        throw new UndefinedFunctionException(id.getValue(), id.getSpan());
                     } else {
                         usedVariables.add(id.getValue());
                     }
 
                     if (definedVariables.get(id.getValue()) != arguments.size()) {
-                        throw new Error("Function '" + id.getValue() + "' has different number of arguments");
+                        throw new InvalidArgumentsCountException(id.getValue(), id.getSpan());
                     }
                 }
             }
@@ -227,7 +229,7 @@ public class SemanticAnalyzer {
             AssignmentIdentifier identifier = assignmentStatement.getIdentifier();
             if (identifier instanceof Identifier id) {
                 if (definedVariables.get(id.getValue()) == null) {
-                    throw new Error("Variable '" + id.getValue() + "' is not defined");
+                    throw new UndefinedVariableException(id.getValue(), id.getSpan());
                 }
             }
 
@@ -242,7 +244,7 @@ public class SemanticAnalyzer {
             currentExpression = expressionElement;
             if (expressionElement instanceof Identifier identifier) {
                 if (definedVariables.get(identifier.getValue()) == null && !isTuple) {
-                    throw new Error("Variable '" + identifier.getValue() + "' is not defined");
+                    throw new UndefinedVariableException(identifier.getValue(), identifier.getSpan());
                 } else {
                     usedVariables.add(identifier.getValue());
                 }

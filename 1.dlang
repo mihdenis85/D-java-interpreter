@@ -1,2 +1,10 @@
-var myTuple := { x := 5, "y", z := 10 }; // 'y' is a pair without a value
-print myTuple;
+var realVar1 := 2.5; // no use
+var realVar2 := 4.245; // no use
+
+var integerVar1 := 3;
+var integerVar2 := 22;
+
+var result;
+
+result := integerVar1 + integerVar2;
+print result; // 25
