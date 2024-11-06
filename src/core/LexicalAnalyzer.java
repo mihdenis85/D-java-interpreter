@@ -246,9 +246,15 @@ public class LexicalAnalyzer {
     private Token startWordAnalysis(String string, Span span) {
         boolean isPayload = false;
         StringBuilder builder = new StringBuilder();
+        boolean isString = false;
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if (c == ' ' || c == '\n') {
+            if (!isString && isQuotationMark(c)) {
+                isString = true;
+            } else if (isString && isQuotationMark(c)) {
+                isString = false;
+            }
+            if ((c == ' ' || c == '\n') && !isString) {
                 if (isPayload)
                     span.posBegin++;
                 else
