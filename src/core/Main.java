@@ -26,6 +26,8 @@ public class Main {
         SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
         Program updatedProgram = semanticAnalyzer.analyze();
 
+        Interpreter interpreter = new Interpreter(updatedProgram.getProgram());
+
         try {
             String result = updatedProgram.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
 
@@ -54,32 +56,6 @@ public class Main {
             System.exit(0);
         }
 
-
-
-
-//        ArrayList<SyntaxElement> variables = program.getProgram();
-//
-//        for (SyntaxElement syntaxElement : variables) {
-//            System.out.println(syntaxElement);
-//        }
-
-//        for (int i = 0; i < tokens.size(); i++) {
-//            Token token = tokens.get(i);
-//            System.out.print(token.value + " ");
-//        }
-//        System.out.println();
-//        System.out.println();
-
-//        for (int i = 0; i < tokens.size(); i++) {
-//            Token token = tokens.get(i);
-//            System.out.println("Type: " + token.getType());
-//            System.out.println("Value: " + token.value);
-//            System.out.println("Id: " + i);
-//            System.out.print("Line number: " + token.span.lineNum + " ");
-//            System.out.print("Position begin: " + token.span.posBegin + " ");
-//            System.out.print("Position end: " + token.span.posEnd + " ");
-//            System.out.println();
-//            System.out.println();
-//        }
+        interpreter.interpret();
     }
 }

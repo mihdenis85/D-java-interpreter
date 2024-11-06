@@ -1,10 +1,7 @@
-var realVar1 := 2.5; // no use
-var realVar2 := 4.245; // no use
+var var1;
 
-var integerVar1 := 3;
-var integerVar2 := 22;
+print var1;
 
-var result;
+var1 := 10;
 
-result := integerVar1 + integerVar2;
-print result; // 25
+print var1;
