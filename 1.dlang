@@ -1,7 +1,5 @@
-var var1;
+var result;
 
-print var1;
+result := 1 > 2 and 56 < 72 - 2;
 
-var1 := 10;
-
-print var1;
+print result;

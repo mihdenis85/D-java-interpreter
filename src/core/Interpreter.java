@@ -1,16 +1,17 @@
 package src.core;
 
+import src.core.expressionElements.*;
 import src.core.literals.*;
 import src.core.syntax.Expression;
 import src.core.syntax.Identifier;
 import src.core.syntax.Variable;
-import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.statements.AssignmentStatement;
 import src.core.syntax.statements.FunctionCall;
 import src.core.syntax.statements.PrintStatement;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,11 +47,36 @@ public class Interpreter<V> {
         System.out.println(this.variables);
     }
 
+    public boolean evaluateExpression(ExpressionElement arg1, ExpressionElement arg2, ExpressionElement operator) {
+        return switch (operator) {
+            case EqualSign equals -> equals.evaluate(arg1, arg2);
+            case NotEqualSign notEquals -> notEquals.evaluate(arg1, arg2);
+            case LessEqualSign lessEqualSign -> lessEqualSign.evaluate(arg1, arg2);
+            case GreaterEqualSign greaterEqualSign -> greaterEqualSign.evaluate(arg1, arg2);
+            case LessSign lessSign -> lessSign.evaluate(arg1, arg2);
+            case GreaterSign greaterSign -> greaterSign.evaluate(arg1, arg2);
+            case LogicalAnd and -> and.evaluate(arg1, arg2);
+            case LogicalOr or -> or.evaluate(arg1, arg2);
+            case LogicalXor xor -> xor.evaluate(arg1, arg2);
+            default -> throw new IllegalStateException("Unexpected value: " + operator);
+        };
+    }
+
     public V parseVariableExpression(Expression variable) {
         ArrayList<ExpressionElement> expression = variable.getExpressions();
-        for (ExpressionElement expressionElement : expression) {
-            return (V) parseElement(expressionElement);
+        SHA sha = new SHA();
+        StringBuilder str = new StringBuilder();
+        boolean result = false;
+
+        for (int i = 1; i < expression.size() - 1; i++) {
+            System.out.println(evaluateExpression(expression.get(i - 1), expression.get(i + 1), expression.get(i)));
+            if ((i + 1) == expression.size()) {
+                break;
+            }
         }
+
+        System.out.println(result);
+//        System.out.println(sha.analyze(String.valueOf(str)));
 
         return null;
     }
@@ -70,19 +96,87 @@ public class Interpreter<V> {
         }
 
         if (element instanceof IntegerLiteral num) {
-            return num.value;
+            return num.value + " ";
         }
 
         if (element instanceof RealLiteral num) {
-            return num.value;
+            return num.value + " ";
         }
 
         if (element instanceof BooleanLiteral bool) {
-            return bool.value;
+            return bool.value + " ";
         }
 
         if (element instanceof Identifier id) {
-            return (String) this.variables.get(id.getValue());
+            return (String) this.variables.get(id.getValue()) + " ";
+        }
+
+        if (element instanceof PlusSign) {
+            return "+ ";
+        }
+
+        if (element instanceof MinusSign) {
+            return "- ";
+        }
+
+        if (element instanceof MultiplySign) {
+            return "* ";
+        }
+
+        if (element instanceof DivideSign) {
+            return "/ ";
+        }
+
+        if (element instanceof LogicalAnd) {
+            return "and ";
+        }
+
+        if (element instanceof LogicalOr) {
+            return "or ";
+        }
+
+        if (element instanceof LogicalXor) {
+            return "xor ";
+        }
+
+        if (element instanceof IsOperator) {
+            return "is ";
+        }
+
+        if (element instanceof LessEqualSign) {
+            return "<= ";
+        }
+
+        if (element instanceof GreaterEqualSign) {
+            return ">= ";
+        }
+
+        if (element instanceof EqualSign) {
+            return "= ";
+        }
+
+        if (element instanceof NotEqualSign) {
+            return "/= ";
+        }
+
+        if (element instanceof LessSign) {
+            return "< ";
+        }
+
+        if (element instanceof GreaterSign) {
+            return "> ";
+        }
+
+        if (element instanceof IntegerType) {
+            return "int ";
+        }
+
+        if (element instanceof RealType) {
+            return "real ";
+        }
+
+        if (element instanceof StringType) {
+            return "string ";
         }
 
         if (element instanceof FunctionCall call) {
