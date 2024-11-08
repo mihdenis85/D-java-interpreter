@@ -374,7 +374,7 @@ public class SyntaxAnalyzer {
             }
             ArrayList<TupleElement> elements = tuple.getElements();
             Token nextToken = peekToken(1);
-            Identifier identifier = new Identifier("", nextToken.span);
+            Identifier identifier = new Identifier("", token.span);
 
             if (token.type == Code.tkIdentifier) {
                 identifier = expectIdentifier();
@@ -438,8 +438,11 @@ public class SyntaxAnalyzer {
                     Token nextToken = peekToken(0);
                     if (nextToken.type == Code.tkDot) {
                         skipToken();
-
-                        yield parseExpressionElement();
+                        Identifier identifier = new Identifier(token.value, token.span);
+                        ExpressionElement attribute = parseExpressionElement();
+                        if( attribute.getClass() ==  IntegerLiteral.class )
+                            attribute = new TupleIndex(((IntegerLiteral) attribute).getValue(), ((IntegerLiteral) attribute).getSpan());
+                        yield new DotNotation(identifier, attribute, token.span);
                     }
                     if (nextToken.type == Code.tkOpenedBracket) {
                         Identifier identifier = new Identifier(token.value, token.span);

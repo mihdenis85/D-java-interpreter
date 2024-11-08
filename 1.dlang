@@ -1,10 +1,1 @@
-var realVar1 := 2.5; // no use
-var realVar2 := 4.245; // no use
-
-var integerVar1 := 3;
-var integerVar2 := 22;
-
-var result;
-
-result := integerVar1 + integerVar2;
-print result; // 25
+return nt.t1.1 + nt.t1.2 + nt.t2.1 + nt.t2.2;
