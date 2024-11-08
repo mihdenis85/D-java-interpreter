@@ -293,7 +293,7 @@ public class SyntaxAnalyzer {
             ArrayList<StatementElement> elseStatementBody = new ArrayList<>();
             while (expectKeyword(Code.tkElse, 0)) {
                 skipToken();
-                elseStatementBody.add(parseStatement());
+                elseStatementBody = parseBody();
             }
 
             matchKeyword(Code.tkEnd);
@@ -376,6 +376,7 @@ public class SyntaxAnalyzer {
             Token nextToken = peekToken(1);
             Identifier identifier = new Identifier("", token.span);
 
+            // TODO: tuple element identifier without a key should be recognized like a value, not a key
             if (token.type == Code.tkIdentifier) {
                 identifier = expectIdentifier();
             }
@@ -430,7 +431,18 @@ public class SyntaxAnalyzer {
 
                     yield parseExpression();
                 }
-                case Code.tkIntegerLiteral -> new IntegerLiteral(token.span, token.value);
+                case Code.tkIntegerLiteral -> {
+                    Token nextToken = peekToken(0);
+                    Token prevToken = peekToken(-2);
+                    if (nextToken.type == Code.tkOpenedBracket && prevToken.type == Code.tkDot) {
+                        Identifier identifier = new Identifier(token.value, token.span);
+                        skipToken();
+                        ArrayList<ExpressionElement> arguments = parseCallArguments();
+                        matchPunct(Code.tkClosedBracket);
+                        yield new FunctionCall(identifier, arguments);
+                    }
+                    yield new IntegerLiteral(token.span, token.value);
+                }
                 case Code.tkRealLiteral -> new RealLiteral(token.span, token.value);
                 case Code.tkStringLiteral -> new StringLiteral(token.span, token.value);
                 case Code.tkBooleanLiteral -> new BooleanLiteral(token.span, token.value);
