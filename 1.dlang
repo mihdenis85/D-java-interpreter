@@ -1,10 +1,10 @@
 // Define a function that multiplies two numbers
-var multiply := func (x, y) is
+var multiply := func (x, y) is 
     return x * y;
 end;
 
 // Create a tuple that stores the function and two integer values
-var myTuple := { c, y := 5, z := 10 };
+var myTuple := { multiply, y := 5, z := 10 };
 
 // Using the tuple to call the function with values
 print myTuple.1(myTuple.y, myTuple.z);  // Should print 50

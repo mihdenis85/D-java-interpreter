@@ -18,6 +18,7 @@ import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.*;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.*;
 
 public class SyntaxAnalyzer {
@@ -376,8 +377,7 @@ public class SyntaxAnalyzer {
             Token nextToken = peekToken(1);
             Identifier identifier = new Identifier("", token.span);
 
-            // TODO: tuple element identifier without a key should be recognized like a value, not a key
-            if (token.type == Code.tkIdentifier) {
+            if (token.type == Code.tkIdentifier && !Objects.equals(nextToken.value, ",")) {
                 identifier = expectIdentifier();
             }
 
