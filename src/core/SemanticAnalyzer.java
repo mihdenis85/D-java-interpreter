@@ -94,9 +94,15 @@ public class SemanticAnalyzer {
         if (syntaxElement instanceof Variable variable) {
             String identifier = variable.getIdentifier().getValue();
             if (!usedVariables.contains(identifier) && isVariableChecking) {
-                this.bodyToCheck.remove(variable);
-                this.isDeleted = true;
-                this.definedVariables.remove(identifier);
+                if (this.bodyToCheck.contains(variable)) {
+                    this.bodyToCheck.remove(variable);
+                    this.isDeleted = true;
+                    this.definedVariables.remove(identifier);
+                } else if (parentBody.contains(variable)) {
+                    this.parentBody.remove(variable);
+                    this.isDeleted = true;
+                    this.definedVariables.remove(identifier);
+                }
             }
 
             definedVariables.put(identifier, 0);
