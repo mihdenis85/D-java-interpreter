@@ -1,6 +1,7 @@
 package src.core.expressionElements;
 
 import src.core.Span;
+import src.core.literals.BooleanLiteral;
 import src.core.syntax.interfaces.ExpressionElement;
 
 public class UnaryNot implements ExpressionElement {
@@ -10,6 +11,10 @@ public class UnaryNot implements ExpressionElement {
     public UnaryNot(String value, Span span) {
         this.value = value;
         this.span = span;
+    }
+
+    public static boolean evaluate(String value) {
+        return !value.equals("true");
     }
 
     @Override

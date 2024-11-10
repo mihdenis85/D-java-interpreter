@@ -1,5 +1,17 @@
-var result;
+var realVar1 := 2.5;
+var realVar2 := 4.245;
 
-result := 1 > 2 and 56 < 72 - 2;
+var integerVar1 := 3;
+var integerVar2 := 22;
 
-print result;
+if 2 = 2.5 then
+    print 1;
+else
+    if 4.245 = 3.0 or 21 = 22 then
+        print 2;
+    else
+        print 4;
+    end;
+end;
+
+//print 3 xor 22;

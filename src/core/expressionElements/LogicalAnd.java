@@ -13,12 +13,8 @@ public class LogicalAnd implements ExpressionElement {
         this.span = span;
     }
 
-    public boolean evaluate(ExpressionElement arg1, ExpressionElement arg2) {
-        if (arg1 instanceof BooleanLiteral b1 && arg2 instanceof BooleanLiteral b2) {
-            return (Boolean) b1.getValue() && (Boolean) b2.getValue();
-        }
-
-        throw new Error("Invalid arguments type");
+    public static boolean evaluate(double arg1, double arg2) {
+        return arg1 != 0.0 && arg2 != 0.0;
     }
 
     @Override
