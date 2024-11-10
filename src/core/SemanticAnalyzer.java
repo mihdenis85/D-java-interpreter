@@ -94,9 +94,15 @@ public class SemanticAnalyzer {
         if (syntaxElement instanceof Variable variable) {
             String identifier = variable.getIdentifier().getValue();
             if (!usedVariables.contains(identifier) && isVariableChecking) {
-                this.bodyToCheck.remove(variable);
-                this.isDeleted = true;
-                this.definedVariables.remove(identifier);
+                if (this.bodyToCheck.contains(variable)) {
+                    this.bodyToCheck.remove(variable);
+                    this.isDeleted = true;
+                    this.definedVariables.remove(identifier);
+                } else if (parentBody.contains(variable)) {
+                    this.parentBody.remove(variable);
+                    this.isDeleted = true;
+                    this.definedVariables.remove(identifier);
+                }
             }
 
             definedVariables.put(identifier, 0);
@@ -112,6 +118,16 @@ public class SemanticAnalyzer {
                     if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
                         if (!definedVariables.containsKey(id.getValue()) && !(currentExpression instanceof TupleLiteral)) {
                             throw new UndefinedFunctionException(id.getValue(), id.getSpan());
+                        }
+                    }
+                }
+            }
+
+            if (expression.getExpressions().getFirst() instanceof DotNotation dotNotation) {
+                if (dotNotation.getIdentifier() instanceof Identifier id) {
+                    if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
+                        if (!definedVariables.containsKey(id.getValue()) && !(currentExpression instanceof TupleLiteral)) {
+                            throw new UndefinedVariableException(id.getValue(), id.getSpan());
                         }
                     }
                 }
@@ -225,6 +241,22 @@ public class SemanticAnalyzer {
             analyzeExpression(arguments);
         }
 
+        if (syntaxElement instanceof DotNotation dotNotation) {
+            AssignmentIdentifier identifier = dotNotation.getIdentifier();
+            if (identifier instanceof Identifier id) {
+                if (definedVariables.get(id.getValue()) == null && isVariableChecking) {
+                    this.parentBody.remove(dotNotation);
+                    return;
+                }
+
+                if (definedVariables.get(id.getValue()) == null) {
+                    throw new UndefinedVariableException(id.getValue(), id.getSpan());
+                } else {
+                    usedVariables.add(id.getValue());
+                }
+            }
+        }
+
         if (syntaxElement instanceof AssignmentStatement assignmentStatement) {
             AssignmentIdentifier identifier = assignmentStatement.getIdentifier();
             if (identifier instanceof Identifier id) {
@@ -274,6 +306,10 @@ public class SemanticAnalyzer {
 
             if (expressionElement instanceof FunctionCall functionCall) {
                 parseStatement(functionCall);
+            }
+
+            if (expressionElement instanceof DotNotation dotNotation) {
+                parseStatement(dotNotation);
             }
         }
     }
