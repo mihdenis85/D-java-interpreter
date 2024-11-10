@@ -117,6 +117,16 @@ public class SemanticAnalyzer {
                 }
             }
 
+            if (expression.getExpressions().getFirst() instanceof DotNotation dotNotation) {
+                if (dotNotation.getIdentifier() instanceof Identifier id) {
+                    if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
+                        if (!definedVariables.containsKey(id.getValue()) && !(currentExpression instanceof TupleLiteral)) {
+                            throw new UndefinedVariableException(id.getValue(), id.getSpan());
+                        }
+                    }
+                }
+            }
+
             analyzeExpression(expression.getExpressions());
         }
 
@@ -225,6 +235,22 @@ public class SemanticAnalyzer {
             analyzeExpression(arguments);
         }
 
+        if (syntaxElement instanceof DotNotation dotNotation) {
+            AssignmentIdentifier identifier = dotNotation.getIdentifier();
+            if (identifier instanceof Identifier id) {
+                if (definedVariables.get(id.getValue()) == null && isVariableChecking) {
+                    this.parentBody.remove(dotNotation);
+                    return;
+                }
+
+                if (definedVariables.get(id.getValue()) == null) {
+                    throw new UndefinedVariableException(id.getValue(), id.getSpan());
+                } else {
+                    usedVariables.add(id.getValue());
+                }
+            }
+        }
+
         if (syntaxElement instanceof AssignmentStatement assignmentStatement) {
             AssignmentIdentifier identifier = assignmentStatement.getIdentifier();
             if (identifier instanceof Identifier id) {
@@ -274,6 +300,10 @@ public class SemanticAnalyzer {
 
             if (expressionElement instanceof FunctionCall functionCall) {
                 parseStatement(functionCall);
+            }
+
+            if (expressionElement instanceof DotNotation dotNotation) {
+                parseStatement(dotNotation);
             }
         }
     }

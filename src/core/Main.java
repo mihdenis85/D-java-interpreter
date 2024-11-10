@@ -23,11 +23,11 @@ public class Main {
 
         Program program = syntaxAnalyzer.buildProgram();
 
-        // SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
-        // Program updatedProgram = semanticAnalyzer.analyze();
+        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
+        Program updatedProgram = semanticAnalyzer.analyze();
 
         try {
-            String result = program.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
+            String result = updatedProgram.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
 
             StringBuilder stringBuilder = new StringBuilder();
             int tabNumber = 0;
