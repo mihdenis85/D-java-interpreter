@@ -1,9 +1,6 @@
 package src.core;
 
-import src.core.expressionElements.LogicalAnd;
-import src.core.expressionElements.LogicalOr;
-import src.core.expressionElements.LogicalXor;
-import src.core.expressionElements.UnaryNot;
+import src.core.expressionElements.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -29,6 +26,7 @@ public class SHA {
         precedence.put("and", 2);
         precedence.put("xor", 2);
         precedence.put("or", 1);
+        precedence.put("is", 0);
 
         Stack<String> operatorStack = new Stack<>();
         List<String> output = new ArrayList<>();
@@ -42,10 +40,12 @@ public class SHA {
             }
         };
 
-        List<String> tokens = tokenize(expression, precedence.keySet());
+        List<String> tokens = tokenize(expression);
 
         for (String token : tokens) {
             if (isNumber.test(token)) {
+                output.add(token);
+            } else if (token.equals("int") || token.equals("real") || token.equals("string") || token.equals("true") || token.equals("false")) {
                 output.add(token);
             } else if (precedence.containsKey(token)) {
                 while (!operatorStack.isEmpty() && precedence.containsKey(operatorStack.peek()) &&
@@ -65,9 +65,9 @@ public class SHA {
         return String.join(",", output);
     }
 
-    private static List<String> tokenize(String expression, Set<String> operators) {
+    private static List<String> tokenize(String expression) {
         List<String> tokens = new ArrayList<>();
-        String regex = "\\s*(>=|<=|/=|>|<|=|xor|and|or|not|\\+|\\-|\\*|/|\\d*\\.?\\d+)\\s*";
+        String regex = "\\s*(>=|<=|/=|>|<|=|xor|and|or|not|is|int|real|string|true|false|\\+|\\-|\\*|/|\\d*\\.?\\d+)\\s*";
 
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(expression);
@@ -81,141 +81,139 @@ public class SHA {
             tokens.add(token.toLowerCase());
             pos = matcher.end();
         }
+
         if (pos != expression.length()) {
             throw new IllegalArgumentException("Недопустимый символ в выражении на позиции " + pos);
         }
         return tokens;
     }
 
-    public double evaluate(String rpnExpression) {
+    public Object evaluate(String rpnExpression) {
         if (rpnExpression == null || rpnExpression.isEmpty()) {
             return 0.0;
         }
 
         String[] tokens = rpnExpression.split(",");
-        Stack<Double> stack = new Stack<>();
+        Stack<Object> stack = new Stack<>();
 
         for (String token : tokens) {
             switch (token) {
-//                case "not":
-//                    if (!stack.isEmpty()) {
-//                        this.lastOperator = "not";
-//                        stack.push(UnaryNot.evaluate(stack.pop()));
-//                    }
-//                    break;
+                case "not":
+                    if (!stack.isEmpty()) {
+                        this.lastOperator = "not";
+                        stack.push(UnaryNot.evaluate(stack.pop()));
+                    }
+                    break;
+
+                case "is":
+                    if (stack.size() >= 2) {
+                        this.lastOperator = "is";
+                        stack.push(IsOperator.evaluate(stack.pop(), stack.pop()));
+                    }
+                    break;
 
                 case "and":
                     this.lastOperator = "and";
                     if (stack.size() >= 2) {
-                        stack.push(LogicalAnd.evaluate(stack.pop(), stack.pop()) ? 1.0 : 0.0);
+                        stack.push(LogicalAnd.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "xor":
                     this.lastOperator = "xor";
                     if (stack.size() >= 2) {
-                        stack.push(LogicalXor.evaluate(stack.pop(), stack.pop()) ? 1.0 : 0.0);
+                        stack.push(LogicalXor.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "or":
                     this.lastOperator = "or";
                     if (stack.size() >= 2) {
-                        stack.push(LogicalOr.evaluate(stack.pop(), stack.pop()) ? 1.0 : 0.0);
+                        stack.push(LogicalOr.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "+":
                     this.lastOperator = "+";
+                    if (stack.size() == 1) {
+                        stack.push(UnaryPlus.evaluate(stack.pop()));
+                    }
+
                     if (stack.size() >= 2) {
-                        stack.push(stack.pop() + stack.pop());
+                        stack.push(PlusSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "-":
                     this.lastOperator = "-";
+                    if (stack.size() == 1) {
+                        stack.push(UnaryMinus.evaluate(stack.pop()));
+                    }
+
                     if (stack.size() >= 2) {
-                        double subtrahend = stack.pop();
-                        double minuend = stack.pop();
-                        stack.push(minuend - subtrahend);
+                        stack.push(MinusSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "*":
                     this.lastOperator = "*";
                     if (stack.size() >= 2) {
-                        stack.push(stack.pop() * stack.pop());
+                        stack.push(MultiplySign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "/":
                     this.lastOperator = "/";
                     if (stack.size() >= 2) {
-                        double divisor = stack.pop();
-                        double dividend = stack.pop();
-                        if (divisor != 0.0) {
-                            stack.push(dividend / divisor);
-                        }
+                        stack.push(DivideSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case ">":
                     this.lastOperator = ">";
                     if (stack.size() >= 2) {
-                        double rightGreater = stack.pop();
-                        double leftGreater = stack.pop();
-                        stack.push(leftGreater > rightGreater ? 1.0 : 0.0);
+                        stack.push(GreaterSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "<":
                     this.lastOperator = "<";
                     if (stack.size() >= 2) {
-                        double rightLess = stack.pop();
-                        double leftLess = stack.pop();
-                        stack.push(leftLess < rightLess ? 1.0 : 0.0);
+                        stack.push(LessSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case ">=":
                     this.lastOperator = ">=";
                     if (stack.size() >= 2) {
-                        double rightGreaterEq = stack.pop();
-                        double leftGreaterEq = stack.pop();
-                        stack.push(leftGreaterEq >= rightGreaterEq ? 1.0 : 0.0);
+                        stack.push(GreaterEqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "<=":
                     this.lastOperator = "<=";
                     if (stack.size() >= 2) {
-                        double rightLessEq = stack.pop();
-                        double leftLessEq = stack.pop();
-                        stack.push(leftLessEq <= rightLessEq ? 1.0 : 0.0);
+                        stack.push(LessEqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "=":
                     this.lastOperator = "=";
                     if (stack.size() >= 2) {
-                        double rightEq = stack.pop();
-                        double leftEq = stack.pop();
-                        stack.push(Double.compare(leftEq, rightEq) == 0 ? 1.0 : 0.0);
+                        stack.push(EqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "/=":
                     this.lastOperator = "/=";
                     if (stack.size() >= 2) {
-                        double rightNeq = stack.pop();
-                        double leftNeq = stack.pop();
-                        stack.push(Double.compare(leftNeq, rightNeq) != 0 ? 1.0 : 0.0);
+                        stack.push(NotEqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 default:
                     try {
-                        stack.push(Double.parseDouble(token));
+                        stack.push(token);
                     } catch (NumberFormatException e) {
                         // Ignore invalid tokens
                     }
@@ -223,7 +221,7 @@ public class SHA {
             }
         }
 
-        return stack.isEmpty() ? 0.0 : stack.pop();
+        return stack.pop();
     }
 
 }

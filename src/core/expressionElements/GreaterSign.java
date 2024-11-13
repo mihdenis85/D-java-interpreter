@@ -14,18 +14,8 @@ public class GreaterSign implements ExpressionElement {
         this.span = span;
     }
 
-    public boolean evaluate(ExpressionElement arg1, ExpressionElement arg2) {
-        return switch (arg1) {
-            case IntegerLiteral num1 when arg2 instanceof IntegerLiteral num2 ->
-                    (int) num1.getValue() > (int) num2.getValue();
-            case IntegerLiteral num1 when arg2 instanceof RealLiteral num2 ->
-                    (float) num1.getValue() > (float) num2.getValue();
-            case RealLiteral num1 when arg2 instanceof IntegerLiteral num2 ->
-                    (float) num1.getValue() > (float) num2.getValue();
-            case RealLiteral num1 when arg2 instanceof RealLiteral num2 ->
-                    (float) num1.getValue() > (float) num2.getValue();
-            case null, default -> throw new Error("Invalid arguments type");
-        };
+    public static boolean evaluate(Object arg1, Object arg2) {
+        return Double.parseDouble(arg2.toString()) > Double.parseDouble(arg1.toString());
     }
 
     @Override

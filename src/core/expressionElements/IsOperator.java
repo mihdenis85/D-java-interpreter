@@ -7,6 +7,8 @@ import src.core.literals.RealLiteral;
 import src.core.literals.StringLiteral;
 import src.core.syntax.interfaces.ExpressionElement;
 
+import java.util.Objects;
+
 public class IsOperator implements ExpressionElement {
     public String value;
     public Span span;
@@ -16,11 +18,28 @@ public class IsOperator implements ExpressionElement {
         this.span = span;
     }
 
-    public boolean evaluate(String type, ExpressionElement value) {
-        switch (type) {
-            case "int" -> { return value instanceof IntegerLiteral; }
-            case "real" -> { return value instanceof RealLiteral; }
-            case "string" -> { return value instanceof StringLiteral; }
+    public static boolean evaluate(Object type, Object value) {
+        System.out.println(type + " " + value);
+        switch (Objects.toString(type)) {
+            case "int" -> {
+                try {
+                    Integer.parseInt(value.toString(), 10);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            case "real" -> {
+                try {
+                    Double.parseDouble(value.toString());
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            case "string" -> {
+                return false;
+            }
             default -> { return false; }
         }
     }

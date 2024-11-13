@@ -8,10 +8,7 @@ import src.core.syntax.Identifier;
 import src.core.syntax.Variable;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
-import src.core.syntax.statements.AssignmentStatement;
-import src.core.syntax.statements.FunctionCall;
-import src.core.syntax.statements.IfStatement;
-import src.core.syntax.statements.PrintStatement;
+import src.core.syntax.statements.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +17,7 @@ import java.util.Scanner;
 
 public class Interpreter<V> {
     private ArrayList<StatementElement> tree;
-    private Map<String, V> variables;
+    private Map<String, Object> variables;
     private String parent;
 
     public Interpreter(ArrayList<StatementElement> tree) {
@@ -52,8 +49,8 @@ public class Interpreter<V> {
                     break;
                 case IfStatement ifStatement:
                     this.parent = "if";
-                    Expression condition = ifStatement.getCondition();
-                    if (parseVariableExpression(condition) instanceof String s && Boolean.parseBoolean(s)) {
+                    Object res = parseVariableExpression(ifStatement.getCondition());
+                    if (Boolean.parseBoolean(res.toString())) {
                         parseBody(ifStatement.getBody());
                     } else {
                         parseBody(ifStatement.getElseBody());
@@ -74,27 +71,11 @@ public class Interpreter<V> {
         return str.toString();
     }
 
-    public V parseVariableExpression(Expression variable) {
+    public Object parseVariableExpression(Expression variable) {
         ArrayList<ExpressionElement> expression = variable.getExpressions();
 
-
         SHA sha = new SHA();
-//        System.out.println(SHA.toRPN(interpretExpression(expression)));
-        double result = sha.evaluate(SHA.toRPN(interpretExpression(expression)));
-
-        if (sha.lastOperator == null) {
-            if (this.parent.equals("if") || this.parent.equals("while")) {
-                return (V) Boolean.toString(result != 0.0);
-            }
-
-            return (V) Double.toString(result);
-        }
-
-        if (sha.lastOperator.equals("+") || sha.lastOperator.equals("-") || sha.lastOperator.equals("*") || sha.lastOperator.equals("/")) {
-            return (V) Double.toString(result);
-        } else {
-            return (V) Boolean.toString(result == 1.0);
-        }
+        return sha.evaluate(SHA.toRPN(interpretExpression(expression)));
     }
 
     public void printInterpretation(ArrayList<Expression> expressions) {
@@ -105,7 +86,7 @@ public class Interpreter<V> {
 
     public String parseElement(ExpressionElement element) {
         return switch (element) {
-            case StringLiteral str -> str.value.substring(1, str.value.length() - 1);
+            case StringLiteral str -> "'" + str.value.substring(1, str.value.length() - 1) + "'";
             case IntegerLiteral integerLiteral -> integerLiteral.value;
             case BooleanLiteral bool -> bool.value;
             case RealLiteral realLiteral -> realLiteral.value;

@@ -13,8 +13,8 @@ public class LogicalXor implements ExpressionElement {
         this.span = span;
     }
 
-    public static boolean evaluate(double arg1, double arg2) {
-        return arg1 != 0.0 ^ arg2 != 0.0;
+    public static boolean evaluate(Object arg1, Object arg2) {
+        return Double.parseDouble(arg1.toString()) != 0.0 ^ Double.parseDouble(arg2.toString()) != 0.0;
     }
 
     @Override

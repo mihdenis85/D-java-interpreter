@@ -12,6 +12,10 @@ public class MinusSign implements ExpressionElement {
         this.span = span;
     }
 
+    public static double evaluate(Object arg1, Object arg2) {
+        return Double.parseDouble(arg1.toString()) - Double.parseDouble(arg2.toString());
+    }
+
     @Override
     public String toJSONString() {
         return "\"MinusSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";

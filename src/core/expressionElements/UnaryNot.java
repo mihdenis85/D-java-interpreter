@@ -13,7 +13,7 @@ public class UnaryNot implements ExpressionElement {
         this.span = span;
     }
 
-    public static boolean evaluate(String value) {
+    public static boolean evaluate(Object value) {
         return !value.equals("true");
     }
 

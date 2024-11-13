@@ -1,17 +1,6 @@
-var realVar1 := 2.5;
-var realVar2 := 4.245;
-
-var integerVar1 := 3;
-var integerVar2 := 22;
-
-if 2 = 2.5 then
-    print 1;
+print 1;
+if 2 > 1 then
+    print "Greater";
 else
-    if 4.245 = 3.0 or 21 = 22 then
-        print 2;
-    else
-        print 4;
-    end;
+    print 22;
 end;
-
-//print 3 xor 22;
