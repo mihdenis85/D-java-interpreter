@@ -47,6 +47,8 @@ public class SHA {
                 output.add(token);
             } else if (token.equals("int") || token.equals("real") || token.equals("string") || token.equals("true") || token.equals("false")) {
                 output.add(token);
+            } else if (token.charAt(0) == '\'' && token.charAt(token.length() - 1) == '\'') {
+                output.add(token);
             } else if (precedence.containsKey(token)) {
                 while (!operatorStack.isEmpty() && precedence.containsKey(operatorStack.peek()) &&
                         precedence.get(operatorStack.peek()) >= precedence.get(token)) {
@@ -67,7 +69,7 @@ public class SHA {
 
     private static List<String> tokenize(String expression) {
         List<String> tokens = new ArrayList<>();
-        String regex = "\\s*(>=|<=|/=|>|<|=|xor|and|or|not|is|int|real|string|true|false|\\+|\\-|\\*|/|\\d*\\.?\\d+)\\s*";
+        String regex = "\\s*(>=|<=|/=|>|<|=|xor|and|or|not|is|int|real|string|true|false|\\+|\\-|\\*|/|\\d*\\.?\\d+|\"[^\"]+\"|'[^']+')\\s*";
 
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(expression);
@@ -78,7 +80,7 @@ public class SHA {
                 throw new IllegalArgumentException("Недопустимый символ в выражении на позиции " + pos);
             }
             String token = matcher.group(1);
-            tokens.add(token.toLowerCase());
+            tokens.add(token);
             pos = matcher.end();
         }
 

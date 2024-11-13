@@ -37,8 +37,11 @@ public class IsOperator implements ExpressionElement {
                     return false;
                 }
             }
+            case "boolean" -> {
+                return value.toString().equals("true") || value.toString().equals("false");
+            }
             case "string" -> {
-                return false;
+                return value.toString().charAt(0) == '\'' && value.toString().charAt(value.toString().length() - 1) == '\'';
             }
             default -> { return false; }
         }
