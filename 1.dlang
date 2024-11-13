@@ -1,6 +1,6 @@
-print 1;
-if 2 > 1 then
-    print "Greater";
-else
-    print 22;
+var i := 0;
+while i <= 5 then
+    print 1;
+    i := i + 1;
 end;
+print 123;

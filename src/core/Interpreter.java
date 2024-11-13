@@ -49,12 +49,21 @@ public class Interpreter<V> {
                     break;
                 case IfStatement ifStatement:
                     this.parent = "if";
-                    Object res = parseVariableExpression(ifStatement.getCondition());
-                    if (Boolean.parseBoolean(res.toString())) {
+                    Object ifRes = parseVariableExpression(ifStatement.getCondition());
+                    if (Boolean.parseBoolean(ifRes.toString())) {
                         parseBody(ifStatement.getBody());
                     } else {
                         parseBody(ifStatement.getElseBody());
                     }
+                    break;
+                case WhileLoop whileLoop:
+                    this.parent = "while";
+                    Object whileRes = parseVariableExpression(whileLoop.getCondition());
+                    while (Boolean.parseBoolean(whileRes.toString())) {
+                        parseBody(whileLoop.getBody());
+                        whileRes = parseVariableExpression(whileLoop.getCondition());
+                    }
+                    break;
                 default:
                     break;
             }
@@ -75,7 +84,9 @@ public class Interpreter<V> {
         ArrayList<ExpressionElement> expression = variable.getExpressions();
 
         SHA sha = new SHA();
-        return sha.evaluate(SHA.toRPN(interpretExpression(expression)));
+        String strExpression = interpretExpression(expression);
+        String rpn = SHA.toRPN(strExpression);
+        return sha.evaluate(rpn);
     }
 
     public void printInterpretation(ArrayList<Expression> expressions) {
@@ -90,7 +101,7 @@ public class Interpreter<V> {
             case IntegerLiteral integerLiteral -> integerLiteral.value;
             case BooleanLiteral bool -> bool.value;
             case RealLiteral realLiteral -> realLiteral.value;
-            case Identifier id -> (String) this.variables.get(id.getValue());
+            case Identifier id -> this.variables.get(id.getValue()).toString();
             case PlusSign ps -> ps.value;
             case UnaryNot not -> not.value;
             case MinusSign ms -> ms.value;
