@@ -102,41 +102,35 @@ public class SHA {
             switch (token) {
                 case "not":
                     if (!stack.isEmpty()) {
-                        this.lastOperator = "not";
                         stack.push(UnaryNot.evaluate(stack.pop()));
                     }
                     break;
 
                 case "is":
                     if (stack.size() >= 2) {
-                        this.lastOperator = "is";
                         stack.push(IsOperator.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "and":
-                    this.lastOperator = "and";
                     if (stack.size() >= 2) {
                         stack.push(LogicalAnd.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "xor":
-                    this.lastOperator = "xor";
                     if (stack.size() >= 2) {
                         stack.push(LogicalXor.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "or":
-                    this.lastOperator = "or";
                     if (stack.size() >= 2) {
                         stack.push(LogicalOr.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "+":
-                    this.lastOperator = "+";
                     if (stack.size() == 1) {
                         stack.push(UnaryPlus.evaluate(stack.pop()));
                     }
@@ -147,7 +141,6 @@ public class SHA {
                     break;
 
                 case "-":
-                    this.lastOperator = "-";
                     if (stack.size() == 1) {
                         stack.push(UnaryMinus.evaluate(stack.pop()));
                     }
@@ -158,56 +151,48 @@ public class SHA {
                     break;
 
                 case "*":
-                    this.lastOperator = "*";
                     if (stack.size() >= 2) {
                         stack.push(MultiplySign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "/":
-                    this.lastOperator = "/";
                     if (stack.size() >= 2) {
                         stack.push(DivideSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case ">":
-                    this.lastOperator = ">";
                     if (stack.size() >= 2) {
                         stack.push(GreaterSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "<":
-                    this.lastOperator = "<";
                     if (stack.size() >= 2) {
                         stack.push(LessSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case ">=":
-                    this.lastOperator = ">=";
                     if (stack.size() >= 2) {
                         stack.push(GreaterEqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "<=":
-                    this.lastOperator = "<=";
                     if (stack.size() >= 2) {
                         stack.push(LessEqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "=":
-                    this.lastOperator = "=";
                     if (stack.size() >= 2) {
                         stack.push(EqualSign.evaluate(stack.pop(), stack.pop()));
                     }
                     break;
 
                 case "/=":
-                    this.lastOperator = "/=";
                     if (stack.size() >= 2) {
                         stack.push(NotEqualSign.evaluate(stack.pop(), stack.pop()));
                     }

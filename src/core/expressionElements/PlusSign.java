@@ -3,6 +3,8 @@ package src.core.expressionElements;
 import src.core.Span;
 import src.core.syntax.interfaces.ExpressionElement;
 
+import java.util.Objects;
+
 public class PlusSign implements ExpressionElement {
     public String value;
     public Span span;
@@ -12,7 +14,13 @@ public class PlusSign implements ExpressionElement {
         this.span = span;
     }
 
-    public static double evaluate(Object arg1, Object arg2) {
+    public static Object evaluate(Object arg1, Object arg2) {
+        boolean isStr1 = arg1.toString().charAt(0) == '\'' && arg1.toString().charAt(arg1.toString().length() - 1) == '\'';
+        boolean isStr2 = arg2.toString().charAt(0) == '\'' && arg2.toString().charAt(arg2.toString().length() - 1) == '\'';
+        if (isStr1 && isStr2) {
+            return arg2.toString().substring(1, arg2.toString().length() - 1) + arg1.toString().substring(1, arg1.toString().length() - 1);
+        }
+
         return Double.parseDouble(arg1.toString()) + Double.parseDouble(arg2.toString());
     }
 
