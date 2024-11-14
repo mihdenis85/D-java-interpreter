@@ -1,3 +1,6 @@
-var array := [90, 1, 2, 3, 4, 5];
-
-print array[1];
+var sum := 0;
+var array := [1, 2, 3, 4, 5];
+for element in array loop
+  sum := sum + element;
+end;
+print sum; // 15

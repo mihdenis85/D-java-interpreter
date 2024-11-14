@@ -243,7 +243,7 @@ public class SyntaxAnalyzer {
 
             matchKeyword(Code.tkIn);
 
-            Expression expression = parseExpression();
+            Identifier expression = expectIdentifier();
 
             matchKeyword(Code.tkLoop);
 

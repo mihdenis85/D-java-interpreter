@@ -16,10 +16,12 @@ public class Interpreter<V> {
     private ArrayList<StatementElement> tree;
     private Map<String, Object> variables;
     private String lastVariableType;
+    private Map<String, Integer> currIndex;
 
     public Interpreter(ArrayList<StatementElement> tree) {
         this.tree = tree;
         this.variables = new HashMap<>();
+        this.currIndex = new HashMap<>();
     }
 
     public void interpret() {
@@ -56,10 +58,35 @@ public class Interpreter<V> {
                         whileRes = parseVariableExpression(whileLoop.getCondition());
                     }
                     break;
+                case ForLoop forLoop:
+                    String id = forLoop.getIdentifier().getValue();
+                    String array = forLoop.getExpression().getValue();
+                    this.currIndex.put(id, 0);
+                    this.variables.put(id, getValueFromArray(0, this.variables.get(array)));
+
+                    while (this.currIndex.get(id) < getArrayLength(this.variables.get(array))) {
+                        this.variables.put(id, getValueFromArray(this.currIndex.get(id), this.variables.get(array)));
+                        parseBody(forLoop.getBody());
+                        this.currIndex.put(id, this.currIndex.get(id) + 1);
+                    }
                 default:
                     break;
             }
         }
+    }
+
+    public int getArrayLength(Object array) {
+        String[] obj = array.toString().substring(1, array.toString().length() - 1).split(",");
+        ArrayList<Object> newArray = new ArrayList<>(Arrays.asList(obj));
+
+        return newArray.size();
+    }
+
+    public Object getValueFromArray(int index, Object array) {
+        String[] obj = array.toString().substring(1, array.toString().length() - 1).split(",");
+        ArrayList<Object> newArray = new ArrayList<>(Arrays.asList(obj));
+
+        return newArray.get(index);
     }
 
     public Object interpretExpression(ArrayList<ExpressionElement> elements) {
@@ -94,6 +121,7 @@ public class Interpreter<V> {
         SHA sha = new SHA();
         Object strExpression = interpretExpression(expression);
         if (this.lastVariableType != null) {
+            this.lastVariableType = null;
             return strExpression;
         }
 
@@ -129,9 +157,7 @@ public class Interpreter<V> {
             case ArrayIndex ai -> {
                 String id = ai.identifier.getValue();
                 int index = Integer.parseInt(interpretExpression(ai.expression.getExpressions()).toString(), 10);
-                String[] obj = this.variables.get(id).toString().substring(1, this.variables.get(id).toString().length() - 1).split(",");
-                ArrayList<Object> array = new ArrayList<>(Arrays.asList(obj));
-                yield array.get(index - 1).toString();
+                yield getValueFromArray(index - 1, this.variables.get(id)).toString();
             }
             case IsOperator isOperator -> isOperator.value;
             case LessEqualSign lessEqualSign -> lessEqualSign.value;

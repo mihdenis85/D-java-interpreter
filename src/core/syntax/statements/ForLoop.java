@@ -9,20 +9,20 @@ import java.util.ArrayList;
 
 public class ForLoop implements StatementElement {
     private final Identifier identifier;
-    private final ExpressionElement expression;
+    private final Identifier array;
     private final ArrayList<StatementElement> body;
 
-    public ForLoop(Identifier identifier, ExpressionElement expression, ArrayList<StatementElement> body) {
+    public ForLoop(Identifier identifier, Identifier array, ArrayList<StatementElement> body) {
         this.identifier = identifier;
-        this.expression = expression;
+        this.array = array;
         this.body = body;
     }
 
     public Identifier getIdentifier() {
         return identifier;
     }
-    public ExpressionElement getExpression() {
-        return expression;
+    public Identifier getExpression() {
+        return array;
     }
     public ArrayList<StatementElement> getBody() {
         return body;
@@ -31,7 +31,7 @@ public class ForLoop implements StatementElement {
     @Override
     public String toJSONString() {
         return "\"ForLoop\": {\n" + identifier.toJSONString() + "," +
-                expression.toJSONString() + "," +
+                array.toJSONString() + "," +
                 "body: " + JSONConvertable.listToJsonString(body) + "}";
     }
 }
