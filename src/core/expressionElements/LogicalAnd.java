@@ -14,7 +14,7 @@ public class LogicalAnd implements ExpressionElement {
     }
 
     public static boolean evaluate(Object arg1, Object arg2) {
-        return Double.parseDouble(arg1.toString()) != 0.0 && Double.parseDouble(arg2.toString()) != 0.0;
+        return Boolean.parseBoolean(arg1.toString()) && Boolean.parseBoolean(arg2.toString());
     }
 
     @Override

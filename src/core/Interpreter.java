@@ -10,15 +10,12 @@ import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
 import src.core.syntax.statements.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Interpreter<V> {
     private ArrayList<StatementElement> tree;
     private Map<String, Object> variables;
-    private String parent;
+    private String lastVariableType;
 
     public Interpreter(ArrayList<StatementElement> tree) {
         this.tree = tree;
@@ -33,22 +30,18 @@ public class Interpreter<V> {
         for (StatementElement element : body) {
             switch (element) {
                 case PrintStatement printStatement:
-                    this.parent = "print";
                     printInterpretation(printStatement.getExpressions());
                     break;
                 case Variable variable:
-                    this.parent = "variable";
                     Identifier identifier = variable.getIdentifier();
                     this.variables.put(identifier.getValue(), parseVariableExpression(variable.getExpression()));
                     break;
                 case AssignmentStatement assignmentStatement:
-                    this.parent = "assignment";
                     if (assignmentStatement.getIdentifier() instanceof Identifier id) {
                         this.variables.put(id.getValue(), parseVariableExpression(assignmentStatement.getExpression()));
                     }
                     break;
                 case IfStatement ifStatement:
-                    this.parent = "if";
                     Object ifRes = parseVariableExpression(ifStatement.getCondition());
                     if (Boolean.parseBoolean(ifRes.toString())) {
                         parseBody(ifStatement.getBody());
@@ -57,7 +50,6 @@ public class Interpreter<V> {
                     }
                     break;
                 case WhileLoop whileLoop:
-                    this.parent = "while";
                     Object whileRes = parseVariableExpression(whileLoop.getCondition());
                     while (Boolean.parseBoolean(whileRes.toString())) {
                         parseBody(whileLoop.getBody());
@@ -70,10 +62,26 @@ public class Interpreter<V> {
         }
     }
 
-    public String interpretExpression(ArrayList<ExpressionElement> elements) {
+    public Object interpretExpression(ArrayList<ExpressionElement> elements) {
         StringBuilder str = new StringBuilder();
+        ArrayList<String> result = new ArrayList<>();
 
         for (ExpressionElement element : elements) {
+            if (element instanceof ArrayIndex) {
+                return parseElement(element);
+            }
+
+            if (element instanceof ArrayLiteral) {
+                this.lastVariableType = "array";
+                String array = parseElement(element);
+                String[] newArray = array.substring(1, array.length() - 1).split(",");
+                for (String elem : newArray) {
+                    SHA sha = new SHA();
+                    result.add(sha.evaluate(SHA.toRPN(elem)).toString());
+                }
+
+                return result;
+            }
             str.append(parseElement(element));
         }
 
@@ -84,8 +92,12 @@ public class Interpreter<V> {
         ArrayList<ExpressionElement> expression = variable.getExpressions();
 
         SHA sha = new SHA();
-        String strExpression = interpretExpression(expression);
-        String rpn = SHA.toRPN(strExpression);
+        Object strExpression = interpretExpression(expression);
+        if (this.lastVariableType != null) {
+            return strExpression;
+        }
+
+        String rpn = SHA.toRPN(strExpression.toString());
         return sha.evaluate(rpn);
     }
 
@@ -102,14 +114,25 @@ public class Interpreter<V> {
             case BooleanLiteral bool -> bool.value;
             case RealLiteral realLiteral -> realLiteral.value;
             case Identifier id -> this.variables.get(id.getValue()).toString();
+            case EmptyLiteral emptyLiteral -> "'" + emptyLiteral.getValue() + "'";
             case PlusSign ps -> ps.value;
             case UnaryNot not -> not.value;
+            case UnaryPlus up -> up.value;
+            case UnaryMinus um -> um.value;
             case MinusSign ms -> ms.value;
             case MultiplySign ms -> ms.value;
             case DivideSign dv -> dv.value;
             case LogicalAnd and -> and.value;
             case LogicalOr or -> or.value;
             case LogicalXor xor -> xor.value;
+            case FunctionStatement fs -> "func";
+            case ArrayIndex ai -> {
+                String id = ai.identifier.getValue();
+                int index = Integer.parseInt(interpretExpression(ai.expression.getExpressions()).toString(), 10);
+                String[] obj = this.variables.get(id).toString().substring(1, this.variables.get(id).toString().length() - 1).split(",");
+                ArrayList<Object> array = new ArrayList<>(Arrays.asList(obj));
+                yield array.get(index - 1).toString();
+            }
             case IsOperator isOperator -> isOperator.value;
             case LessEqualSign lessEqualSign -> lessEqualSign.value;
             case GreaterEqualSign greaterEqualSign -> greaterEqualSign.value;
@@ -120,6 +143,19 @@ public class Interpreter<V> {
             case IntegerType integer -> integer.value;
             case RealType realType -> realType.value;
             case StringType string -> string.value;
+            case ArrayLiteral al -> {
+                StringBuilder array = new StringBuilder();
+                array.append("[");
+                ArrayList<Expression> elements = al.getElements();
+                for (int i = 0; i < elements.size(); i++) {
+                    array.append(interpretExpression(elements.get(i).getExpressions()));
+                    if (i != elements.size() - 1) {
+                        array.append(",");
+                    }
+                }
+                array.append("]");
+                yield array.toString();
+            }
             case FunctionCall call -> {
                 if (call.getIdentifier() instanceof Identifier id) {
                     Scanner reader = new Scanner(System.in);

@@ -13,7 +13,13 @@ public class MinusSign implements ExpressionElement {
     }
 
     public static double evaluate(Object arg1, Object arg2) {
-        return Double.parseDouble(arg1.toString()) - Double.parseDouble(arg2.toString());
+        try {
+            int num1 = Integer.parseInt(arg1.toString());
+            int num2 = Integer.parseInt(arg2.toString());
+            return num2 - num1;
+        } catch (Exception e) {
+            return Double.parseDouble(arg2.toString()) - Double.parseDouble(arg1.toString());
+        }
     }
 
     @Override

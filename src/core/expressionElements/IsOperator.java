@@ -19,7 +19,6 @@ public class IsOperator implements ExpressionElement {
     }
 
     public static boolean evaluate(Object type, Object value) {
-        System.out.println(type + " " + value);
         switch (Objects.toString(type)) {
             case "int" -> {
                 try {
@@ -31,14 +30,19 @@ public class IsOperator implements ExpressionElement {
             }
             case "real" -> {
                 try {
-                    Double.parseDouble(value.toString());
-                    return true;
+                    String regex = "^\\s*[+-]?\\d+(\\.0+)?\\s*$";
+                    if (!value.toString().matches(regex)) {
+                        if (value.toString().charAt(0) == '\'' && value.toString().charAt(value.toString().length() - 1) == '\'') {
+                            throw new Exception("");
+                        }
+
+                        return true;
+                    }
+
+                    throw new Exception("");
                 } catch (Exception e) {
                     return false;
                 }
-            }
-            case "boolean" -> {
-                return value.toString().equals("true") || value.toString().equals("false");
             }
             case "string" -> {
                 return value.toString().charAt(0) == '\'' && value.toString().charAt(value.toString().length() - 1) == '\'';

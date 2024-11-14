@@ -45,7 +45,7 @@ public class SHA {
         for (String token : tokens) {
             if (isNumber.test(token)) {
                 output.add(token);
-            } else if (token.equals("int") || token.equals("real") || token.equals("string") || token.equals("true") || token.equals("false")) {
+            } else if (token.equals("int") || token.equals("real") || token.equals("string") || token.equals("true") || token.equals("false") || token.equals("func")) {
                 output.add(token);
             } else if (token.charAt(0) == '\'' && token.charAt(token.length() - 1) == '\'') {
                 output.add(token);
@@ -69,7 +69,7 @@ public class SHA {
 
     private static List<String> tokenize(String expression) {
         List<String> tokens = new ArrayList<>();
-        String regex = "\\s*(>=|<=|/=|>|<|=|xor|and|or|not|is|int|real|string|true|false|\\+|\\-|\\*|/|\\d*\\.?\\d+|\"[^\"]+\"|'[^']+')\\s*";
+        String regex = "\\s*(>=|<=|/=|>|<|=|xor|and|or|not|is|int|real|string|true|false|func|\\+|\\-|\\*|/|\\d*\\.?\\d+|\"[^\"]+\"|'[^']+')\\s*";
 
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(expression);

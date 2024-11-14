@@ -12,8 +12,12 @@ public class UnaryPlus implements ExpressionElement {
         this.span = span;
     }
 
-    public static double evaluate(Object arg1) {
-        return Double.parseDouble(arg1.toString()) + 1;
+    public static Object evaluate(Object arg1) {
+        try {
+            return Integer.parseInt(arg1.toString()) + 1;
+        } catch (Exception e) {
+            return Double.parseDouble(arg1.toString()) + 1;
+        }
     }
 
     @Override
