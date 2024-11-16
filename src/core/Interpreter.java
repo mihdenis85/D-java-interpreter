@@ -18,10 +18,12 @@ public class Interpreter<V> {
     private Map<String, Integer> currIndex;
     private Map<String, FunctionStatement> functions;
     private ArrayList<FunctionStatement> functionList;
+    private Object returnValue;
     private String lastVariableType;
 
     public Interpreter(ArrayList<StatementElement> tree) {
         this.tree = tree;
+        this.returnValue = null;
         this.variables = new HashMap<>();
         this.currIndex = new HashMap<>();
         this.functions = new HashMap<>();
@@ -32,14 +34,19 @@ public class Interpreter<V> {
         parseBody(tree);
     }
 
-    public Object parseBody(ArrayList<StatementElement> body) {
+    public void parseBody(ArrayList<StatementElement> body) {
         for (StatementElement element : body) {
             switch (element) {
                 case PrintStatement printStatement:
                     printInterpretation(printStatement.getExpressions());
                     break;
                 case ReturnStatement returnStatement:
-                    return parseVariableExpression(returnStatement.getExpression());
+                    if (returnValue != null) {
+                        break;
+                    }
+
+                    returnValue = parseVariableExpression(returnStatement.getExpression());
+                    break;
                 case Variable variable:
                     Identifier identifier = variable.getIdentifier();
 
@@ -88,7 +95,6 @@ public class Interpreter<V> {
                     break;
             }
         }
-        return null;
     }
 
     public int getArrayLength(Object array) {
@@ -237,12 +243,12 @@ public class Interpreter<V> {
                                 func.variablesInScope.put(ids.get(i).getValue(), parseElement(values.get(i)));
                             }
 
-                            Object result = parseBody(func.getBody());
+                            parseBody(func.getBody());
 
                             func.variablesInScope.clear();
                             this.functionList.removeLast();
 
-                            yield result.toString();
+                            yield returnValue.toString();
                         }
                     }
                 }
