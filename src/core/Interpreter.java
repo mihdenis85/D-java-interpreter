@@ -42,6 +42,7 @@ public class Interpreter<V> {
                     return parseVariableExpression(returnStatement.getExpression());
                 case Variable variable:
                     Identifier identifier = variable.getIdentifier();
+
                     this.variables.put(identifier.getValue(), parseVariableExpression(variable.getExpression()));
                     if (this.variables.get(identifier.getValue()).equals("func")) {
                         for (ExpressionElement el : variable.getExpression().getExpressions()) {
