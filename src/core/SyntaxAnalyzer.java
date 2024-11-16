@@ -519,12 +519,12 @@ public class SyntaxAnalyzer {
         ArrayList<ExpressionElement> arguments = new ArrayList<>();
 
         if (!expectPunct(Code.tkClosedBracket, 0)) {
-            arguments.add(parseExpression());
+            arguments.add(parseExpressionElement());
 
             while (expectPunct(Code.tkComma, 0)) {
                 skipToken();
 
-                arguments.add(parseExpression());
+                arguments.add(parseExpressionElement());
             }
         }
 

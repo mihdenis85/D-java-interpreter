@@ -15,28 +15,42 @@ import java.util.*;
 public class Interpreter<V> {
     private ArrayList<StatementElement> tree;
     private Map<String, Object> variables;
-    private String lastVariableType;
     private Map<String, Integer> currIndex;
+    private Map<String, FunctionStatement> functions;
+    private ArrayList<FunctionStatement> functionList;
+    private String lastVariableType;
 
     public Interpreter(ArrayList<StatementElement> tree) {
         this.tree = tree;
         this.variables = new HashMap<>();
         this.currIndex = new HashMap<>();
+        this.functions = new HashMap<>();
+        this.functionList = new ArrayList<>();
     }
 
     public void interpret() {
         parseBody(tree);
     }
 
-    public void parseBody(ArrayList<StatementElement> body) {
+    public Object parseBody(ArrayList<StatementElement> body) {
         for (StatementElement element : body) {
             switch (element) {
                 case PrintStatement printStatement:
                     printInterpretation(printStatement.getExpressions());
                     break;
+                case ReturnStatement returnStatement:
+                    return parseVariableExpression(returnStatement.getExpression());
                 case Variable variable:
                     Identifier identifier = variable.getIdentifier();
                     this.variables.put(identifier.getValue(), parseVariableExpression(variable.getExpression()));
+                    if (this.variables.get(identifier.getValue()).equals("func")) {
+                        for (ExpressionElement el : variable.getExpression().getExpressions()) {
+                            if (el instanceof FunctionStatement functionStatement) {
+                                this.functions.put(identifier.getValue(), functionStatement);
+                                this.variables.remove(identifier.getValue());
+                            }
+                        }
+                    }
                     break;
                 case AssignmentStatement assignmentStatement:
                     if (assignmentStatement.getIdentifier() instanceof Identifier id) {
@@ -73,6 +87,7 @@ public class Interpreter<V> {
                     break;
             }
         }
+        return null;
     }
 
     public int getArrayLength(Object array) {
@@ -109,6 +124,11 @@ public class Interpreter<V> {
 
                 return result;
             }
+
+            if (element instanceof FunctionStatement) {
+                this.lastVariableType = "functionCall";
+            }
+
             str.append(parseElement(element));
         }
 
@@ -141,7 +161,16 @@ public class Interpreter<V> {
             case IntegerLiteral integerLiteral -> integerLiteral.value;
             case BooleanLiteral bool -> bool.value;
             case RealLiteral realLiteral -> realLiteral.value;
-            case Identifier id -> this.variables.get(id.getValue()).toString();
+            case Identifier id -> {
+                for (FunctionStatement functionStatement : functionList) {
+                    Object value = functionStatement.variablesInScope.get(id.getValue());
+                    if (value != null) {
+                        yield value.toString();
+                    }
+                }
+
+                yield this.variables.get(id.getValue()).toString();
+            }
             case EmptyLiteral emptyLiteral -> "'" + emptyLiteral.getValue() + "'";
             case PlusSign ps -> ps.value;
             case UnaryNot not -> not.value;
@@ -153,7 +182,7 @@ public class Interpreter<V> {
             case LogicalAnd and -> and.value;
             case LogicalOr or -> or.value;
             case LogicalXor xor -> xor.value;
-            case FunctionStatement fs -> "func";
+            case FunctionStatement functionStatement -> "func";
             case ArrayIndex ai -> {
                 String id = ai.identifier.getValue();
                 int index = Integer.parseInt(interpretExpression(ai.expression.getExpressions()).toString(), 10);
@@ -198,7 +227,21 @@ public class Interpreter<V> {
                             yield reader.next();
                         }
                         default -> {
-                            // TODO: Perform all other function calls
+                            FunctionStatement func = this.functions.get(id.getValue());
+                            this.functionList.add(func);
+                            ArrayList<Identifier> ids = func.getArguments();
+                            ArrayList<ExpressionElement> values = call.getArguments();
+
+                            for (int i = 0; i < ids.size(); i++) {
+                                func.variablesInScope.put(ids.get(i).getValue(), parseElement(values.get(i)));
+                            }
+
+                            Object result = parseBody(func.getBody());
+
+                            func.variablesInScope.clear();
+                            this.functionList.removeLast();
+
+                            yield result.toString();
                         }
                     }
                 }
