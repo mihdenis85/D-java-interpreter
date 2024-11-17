@@ -1,5 +1,6 @@
 package src.core.syntax.statements;
 
+import src.core.syntax.Expression;
 import src.core.syntax.Identifier;
 import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
@@ -10,14 +11,14 @@ import java.util.ArrayList;
 
 public class FunctionCall implements ExpressionElement, StatementElement {
     private final AssignmentIdentifier identifier;
-    private final ArrayList<ExpressionElement> arguments;
+    private final ArrayList<Expression> arguments;
 
-    public FunctionCall(AssignmentIdentifier identifier, ArrayList<ExpressionElement> arguments) {
+    public FunctionCall(AssignmentIdentifier identifier, ArrayList<Expression> arguments) {
         this.identifier = identifier;
         this.arguments = arguments;
     }
 
-    public ArrayList<ExpressionElement> getArguments() {
+    public ArrayList<Expression> getArguments() {
         return arguments;
     }
     public AssignmentIdentifier getIdentifier() {

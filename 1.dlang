@@ -1,4 +1,9 @@
-var array := [1,2,3,4];
-var test := 1;
+var factorial := func (n) is
+    if n = 0 then
+        return 1;
+    else
+        return n * factorial(n - 1);
+    end;
+end;
 
-print test;
+print factorial(5); // Should print 120

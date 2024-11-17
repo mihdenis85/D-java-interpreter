@@ -216,7 +216,7 @@ public class SemanticAnalyzer {
 
         if (syntaxElement instanceof FunctionCall functionCall) {
             AssignmentIdentifier identifier = functionCall.getIdentifier();
-            ArrayList<ExpressionElement> arguments = functionCall.getArguments();
+            ArrayList<Expression> arguments = functionCall.getArguments();
             if (identifier instanceof Identifier id) {
                 if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
                     if (definedVariables.get(id.getValue()) == null && isVariableChecking) {
@@ -238,7 +238,9 @@ public class SemanticAnalyzer {
                 }
             }
 
-            analyzeExpression(arguments);
+            for (Expression argument : arguments) {
+                analyzeExpression(argument.getExpressions());
+            }
         }
 
         if (syntaxElement instanceof DotNotation dotNotation) {

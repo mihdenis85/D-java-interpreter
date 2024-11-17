@@ -12,8 +12,14 @@ public class MultiplySign implements ExpressionElement {
         this.span = span;
     }
 
-    public static double evaluate(Object arg1, Object arg2) {
-        return Double.parseDouble(arg1.toString()) * Double.parseDouble(arg2.toString());
+    public static Object evaluate(Object arg1, Object arg2) {
+        try {
+            int num1 = Integer.parseInt(arg1.toString());
+            int num2 = Integer.parseInt(arg2.toString());
+            return num2 * num1;
+        } catch (Exception e) {
+            return Double.parseDouble(arg1.toString()) * Double.parseDouble(arg2.toString());
+        }
     }
 
     @Override

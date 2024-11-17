@@ -12,7 +12,7 @@ public class MinusSign implements ExpressionElement {
         this.span = span;
     }
 
-    public static double evaluate(Object arg1, Object arg2) {
+    public static Object evaluate(Object arg1, Object arg2) {
         try {
             int num1 = Integer.parseInt(arg1.toString());
             int num2 = Integer.parseInt(arg2.toString());

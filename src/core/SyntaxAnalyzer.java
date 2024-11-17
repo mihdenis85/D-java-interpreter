@@ -133,7 +133,7 @@ public class SyntaxAnalyzer {
             if (token.type == Code.tkOpenedBracket) {
                 skipToken();
 
-                ArrayList<ExpressionElement> arguments = parseCallArguments();
+                ArrayList<Expression> arguments = parseCallArguments();
                 matchPunct(Code.tkClosedBracket);
                 matchPunct(Code.tkSemicolon);
                 return new FunctionCall(identifier, arguments);
@@ -437,7 +437,7 @@ public class SyntaxAnalyzer {
                     if (nextToken.type == Code.tkOpenedBracket && prevToken.type == Code.tkDot) {
                         Identifier identifier = new Identifier(token.value, token.span);
                         skipToken();
-                        ArrayList<ExpressionElement> arguments = parseCallArguments();
+                        ArrayList<Expression> arguments = parseCallArguments();
                         matchPunct(Code.tkClosedBracket);
                         yield new FunctionCall(identifier, arguments);
                     }
@@ -459,7 +459,7 @@ public class SyntaxAnalyzer {
                     if (nextToken.type == Code.tkOpenedBracket) {
                         Identifier identifier = new Identifier(token.value, token.span);
                         skipToken();
-                        ArrayList<ExpressionElement> arguments = parseCallArguments();
+                        ArrayList<Expression> arguments = parseCallArguments();
                         matchPunct(Code.tkClosedBracket);
                         yield new FunctionCall(identifier, arguments);
                     }
@@ -515,16 +515,16 @@ public class SyntaxAnalyzer {
         return null;
     }
 
-    private ArrayList<ExpressionElement> parseCallArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
-        ArrayList<ExpressionElement> arguments = new ArrayList<>();
+    private ArrayList<Expression> parseCallArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+        ArrayList<Expression> arguments = new ArrayList<>();
 
         if (!expectPunct(Code.tkClosedBracket, 0)) {
-            arguments.add(parseExpressionElement());
+            arguments.add(parseExpression());
 
             while (expectPunct(Code.tkComma, 0)) {
                 skipToken();
 
-                arguments.add(parseExpressionElement());
+                arguments.add(parseExpression());
             }
         }
 

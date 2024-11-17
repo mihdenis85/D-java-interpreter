@@ -157,7 +157,7 @@ public class Interpreter<V> {
 
     public void printInterpretation(ArrayList<Expression> expressions) {
         for (Expression expression : expressions) {
-            System.out.println(parseVariableExpression(expression));
+            System.out.println(parseVariableExpression(expression).toString().replace("'", ""));
         }
     }
 
@@ -241,10 +241,12 @@ public class Interpreter<V> {
                             FunctionStatement func = this.functions.get(id.getValue());
                             this.functionList.add(func);
                             ArrayList<Identifier> ids = func.getArguments();
-                            ArrayList<ExpressionElement> values = call.getArguments();
+                            ArrayList<Expression> values = call.getArguments();
+
 
                             for (int i = 0; i < ids.size(); i++) {
-                                func.variablesInScope.put(ids.get(i).getValue(), parseElement(values.get(i)));
+                                Object interpretedExpression = parseVariableExpression(values.get(i));
+                                func.variablesInScope.put(ids.get(i).getValue(), interpretedExpression);
                             }
 
                             parseBody(func.getBody());

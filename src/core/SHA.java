@@ -56,7 +56,7 @@ public class SHA {
                 }
                 operatorStack.push(token);
             } else {
-                throw new IllegalArgumentException("Недопустимый токен: " + token);
+                throw new IllegalArgumentException("Invalid token: " + token);
             }
         }
 
@@ -77,7 +77,7 @@ public class SHA {
         int pos = 0;
         while (matcher.find()) {
             if (matcher.start() != pos) {
-                throw new IllegalArgumentException("Недопустимый символ в выражении на позиции " + pos);
+                throw new IllegalArgumentException("Invalid character in the expression at position " + pos);
             }
             String token = matcher.group(1);
             tokens.add(token);
@@ -85,7 +85,7 @@ public class SHA {
         }
 
         if (pos != expression.length()) {
-            throw new IllegalArgumentException("Недопустимый символ в выражении на позиции " + pos);
+            throw new IllegalArgumentException("Invalid character in the expression at position " + pos);
         }
         return tokens;
     }
