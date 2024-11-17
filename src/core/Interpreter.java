@@ -49,7 +49,6 @@ public class Interpreter<V> {
                     break;
                 case Variable variable:
                     Identifier identifier = variable.getIdentifier();
-
                     this.variables.put(identifier.getValue(), parseVariableExpression(variable.getExpression()));
                     if (this.variables.get(identifier.getValue()).equals("func")) {
                         for (ExpressionElement el : variable.getExpression().getExpressions()) {
@@ -176,7 +175,12 @@ public class Interpreter<V> {
                     }
                 }
 
-                yield this.variables.get(id.getValue()).toString();
+                Object result = this.variables.get(id.getValue());
+                if (result.toString().charAt(0) == '[' && result.toString().charAt(result.toString().length() - 1) == ']') {
+                    this.lastVariableType = "array";
+                }
+
+                yield result.toString();
             }
             case EmptyLiteral emptyLiteral -> "'" + emptyLiteral.getValue() + "'";
             case PlusSign ps -> ps.value;
