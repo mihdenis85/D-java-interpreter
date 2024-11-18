@@ -1,0 +1,12 @@
+var pow := func (base, exponent) is
+  var result := 1;
+  var i := 0;
+  while i < exponent loop
+    result := result * base;
+    i := i + 1;
+  end;
+  return result;
+
+end;
+
+print pow(2, 3); // 8

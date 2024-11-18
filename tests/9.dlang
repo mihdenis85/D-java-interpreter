@@ -1,0 +1,16 @@
+var add := func (a, b) is
+  return a + b;
+end;
+
+var mult := func (a, b) is
+  return a * b;
+end;
+
+var num1 := 7; //should be readInt() instead but in tests is swapped
+var num2 := 4; //should be readInt() instead but in tests is swapped
+
+if num1 < 0 or num2 < 0 then
+  print mult(num1, num2);
+else
+  print add(num1, num2);
+end;

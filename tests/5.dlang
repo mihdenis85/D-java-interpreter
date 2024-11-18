@@ -1,0 +1,14 @@
+var testVar := 5;
+print testVar is string; // false
+print testVar is real; // false
+print testVar is int; // true
+
+testVar := 1.5;
+print testVar is string; // false
+print testVar is real; // true
+print testVar is int; //false
+
+testVar := 'string';
+print testVar is string; // true
+print testVar is real; // false
+print testVar is int; // false

@@ -1,0 +1,6 @@
+var userAge := 8; //should be readInt() instead but in tests is swapped
+if userAge < 18 then
+  print "You are under 18";
+else
+  print "You are over 18";
+end;

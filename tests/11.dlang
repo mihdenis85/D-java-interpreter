@@ -1,0 +1,2 @@
+var userInput := "Hello"; //should be readInt() instead but in tests is swapped
+print userInput;

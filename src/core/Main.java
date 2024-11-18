@@ -1,32 +1,108 @@
 package src.core;
 
-import src.core.syntax.Operator;
 import src.core.syntax.Program;
-import src.core.syntax.Variable;
 import src.core.syntax.interfaces.SyntaxElement;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        String source = "1.dlang";
-        InputStream inputStream = new FileInputStream(source);
+        File testDir = new File("tests/");
+        File[] files = testDir.listFiles();
 
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(inputStream);
+        // Check if tests directory exists and is not empty
+        if (files == null) {
+            System.out.println("Tests directory not found or is empty.");
+            return;
+        }
 
-        ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
-        SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
+        // Filter only files that end with .dlang and sort them
+        File[] testFiles = Arrays.stream(files)
+                .filter(file -> file.isFile() && file.getName().endsWith(".dlang"))
+                .sorted(Comparator.comparing(File::getName))
+                .toArray(File[]::new);
 
-        Program program = syntaxAnalyzer.buildProgram();
+        int passedTests = 0;
+        int totalTests = testFiles.length;
 
-        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
-        Program updatedProgram = semanticAnalyzer.analyze();
+        for (File testFile : testFiles) {
+            boolean testCrash = false;
+            String testFileName = testFile.getName();
+            String testName = testFileName.substring(0, testFileName.lastIndexOf('.')); // e.g., "1"
 
-        Interpreter interpreter = new Interpreter(updatedProgram.getProgram());
+            String expectedOutputFileName = testName + "_expected.txt";
+            String outputFileName = testName + "_output.txt";
+
+            InputStream inputStream = new FileInputStream(testFile);
+
+            // Redirect System.out to capture output
+            PrintStream originalOut = System.out;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream newOut = new PrintStream(baos);
+            System.setOut(newOut);
+
+            try {
+                // Run the compiler/interpreter
+                LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(inputStream);
+                ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
+
+                SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
+                Program program = syntaxAnalyzer.buildProgram();
+
+                SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
+                Program updatedProgram = semanticAnalyzer.analyze();
+
+                Interpreter interpreter = new Interpreter(updatedProgram.getProgram());
+                interpreter.interpret();
+            } catch (Exception e) {
+                testCrash = true;
+                // e.printStackTrace(); // Uncomment to see error messages
+            } finally {
+                System.out.flush();
+                System.setOut(originalOut);
+            }
+
+            // Write the output to output file
+            String output = baos.toString();
+            BufferedWriter writer = new BufferedWriter(new FileWriter("tests/" + outputFileName));
+            writer.write(output);
+            writer.close();
+
+            // Read the expected output file
+            File expectedOutputFile = new File("tests/" + expectedOutputFileName);
+            if (!expectedOutputFile.exists()) {
+                System.out.println("Expected output file " + expectedOutputFileName + " not found for test " + testName + ".");
+                continue;
+            }
+            BufferedReader expectedReader = new BufferedReader(new FileReader(expectedOutputFile));
+            StringBuilder expectedOutputBuilder = new StringBuilder();
+            String line;
+            while ((line = expectedReader.readLine()) != null) {
+                expectedOutputBuilder.append(line).append("\n");
+            }
+            expectedReader.close();
+
+            String expectedOutput = expectedOutputBuilder.toString();
+
+            // Compare the outputs (trim to ignore leading/trailing whitespaces)
+            String normalizedOutput = normalizeLineEndings(output);
+            String normalizedExpectedOutput = normalizeLineEndings(expectedOutput);
+
+            if (testCrash) {
+                System.out.println("Test " + testName + " error.");
+            } else if (normalizedOutput.trim().equals(normalizedExpectedOutput.trim())) {
+                System.out.println("Test " + testName + " passed.");
+                passedTests++;
+            } else {
+                System.out.println("Test " + testName + " failed.");
+            }
+        }
+
+        System.out.println("Passed " + passedTests + " out of " + totalTests + " tests.");
 
 //        try {
 //            String result = updatedProgram.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
@@ -55,7 +131,8 @@ public class Main {
 //        } catch (Exception e) {
 //            System.exit(0);
 //        }
-
-        interpreter.interpret();
+    }
+    private static String normalizeLineEndings(String str) {
+        return str.replaceAll("\\r\\n", "\n").replaceAll("\\r", "\n");
     }
 }
