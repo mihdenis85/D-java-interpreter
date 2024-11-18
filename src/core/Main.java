@@ -14,13 +14,6 @@ public class Main {
         File testDir = new File("tests/");
         File[] files = testDir.listFiles();
 
-        // Check if tests directory exists and is not empty
-        if (files == null) {
-            System.out.println("Tests directory not found or is empty.");
-            return;
-        }
-
-        // Filter only files that end with .dlang and sort them
         File[] testFiles = Arrays.stream(files)
                 .filter(file -> file.isFile() && file.getName().endsWith(".dlang"))
                 .sorted(Comparator.comparing(File::getName))
@@ -46,7 +39,6 @@ public class Main {
             System.setOut(newOut);
 
             try {
-                // Run the compiler/interpreter
                 LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(inputStream);
                 ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
 
@@ -60,19 +52,17 @@ public class Main {
                 interpreter.interpret();
             } catch (Exception e) {
                 testCrash = true;
-                // e.printStackTrace(); // Uncomment to see error messages
+                // e.printStackTrace();
             } finally {
                 System.out.flush();
                 System.setOut(originalOut);
             }
 
-            // Write the output to output file
             String output = baos.toString();
             BufferedWriter writer = new BufferedWriter(new FileWriter("tests/" + outputFileName));
             writer.write(output);
             writer.close();
 
-            // Read the expected output file
             File expectedOutputFile = new File("tests/" + expectedOutputFileName);
             if (!expectedOutputFile.exists()) {
                 System.out.println("Expected output file " + expectedOutputFileName + " not found for test " + testName + ".");
@@ -88,8 +78,8 @@ public class Main {
 
             String expectedOutput = expectedOutputBuilder.toString();
 
-            // Compare the outputs (trim to ignore leading/trailing whitespaces)
             String normalizedOutput = normalizeLineEndings(output);
+//            System.out.println(normalizedOutput);
             String normalizedExpectedOutput = normalizeLineEndings(expectedOutput);
 
             if (testCrash) {
