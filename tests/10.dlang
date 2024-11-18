@@ -1,0 +1,30 @@
+var bubbleSort := func (array, n) is
+  var passes := 0;
+  for _ in array loop
+    if passes >= n - 1 then
+        return array;
+    end;
+    var swapped := false;
+    var i := 1;
+    for elem in array loop
+      if i <= n then
+        if array[i] > array[i + 1] then
+            var tempElem := array[i];
+            array[i] := array[i + 1];
+            array[i + 1] := tempElem;
+            swapped := true;
+        end;
+        i := i + 1;
+      end;
+    end;
+    if not swapped then
+      return array;
+    end;
+    passes := passes + 1;
+  end;
+  return array;
+end;
+
+var array := [64, 34, 25, 12, 22, 11, 90];
+// Sorted list: [11, 12, 22, 25, 34, 64, 90]
+print bubbleSort(array, 7);

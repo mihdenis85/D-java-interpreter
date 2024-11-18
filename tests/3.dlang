@@ -1,0 +1,26 @@
+var realVar1 := 2.5;
+var realVar2 := 4.245;
+
+var integerVar1 := 3;
+var integerVar2 := 22;
+
+print integerVar1 > integerVar2; // false
+print integerVar1 >= integerVar2; // false
+print integerVar2 = integerVar1; // false
+print integerVar2 /= integerVar1; // true
+print integerVar1 < integerVar2; // true
+print integerVar1 <= integerVar2; // true
+
+print realVar1 > realVar2; // false
+print realVar1 >= realVar2; // false
+print realVar1 = realVar2; // false
+print realVar1 /= realVar2; // true
+print realVar1 < realVar2; // true
+print realVar1 <= realVar2; // true
+
+print integerVar1 > realVar2; // false
+print integerVar1 >= realVar2; // false
+print integerVar1 = realVar2; // false
+print integerVar1 /= realVar2; // true
+print integerVar1 < realVar2; // true
+print integerVar1 <= realVar2; // true
