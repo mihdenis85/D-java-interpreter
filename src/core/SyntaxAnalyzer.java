@@ -453,7 +453,7 @@ public class SyntaxAnalyzer {
                         Identifier identifier = new Identifier(token.value, token.span);
                         ExpressionElement attribute = parseExpressionElement();
                         if( attribute.getClass() ==  IntegerLiteral.class )
-                            attribute = new TupleIndex(((IntegerLiteral) attribute).getValue(), ((IntegerLiteral) attribute).getSpan());
+                            attribute = new TupleIndex(((IntegerLiteral) attribute).getValue(), ((IntegerLiteral) attribute).getSpan(), identifier);
                         yield new DotNotation(identifier, attribute, token.span);
                     }
                     if (nextToken.type == Code.tkOpenedBracket) {

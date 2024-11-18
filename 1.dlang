@@ -1,9 +1,5 @@
-var factorial := func (n) is
-    if n = 0 then
-        return 1;
-    else
-        return n * factorial(n - 1);
-    end;
-end;
+var array := [64, 34, 25, 12, 22, 11, 90];
+var i;
+i := 1;
 
-print factorial(5); // Should print 120
+print array[i] > array[i+1];

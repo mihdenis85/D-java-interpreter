@@ -92,7 +92,7 @@ public class SHA {
 
     public Object evaluate(String rpnExpression) {
         if (rpnExpression == null || rpnExpression.isEmpty()) {
-            return 0.0;
+            return null;
         }
 
         String[] tokens = rpnExpression.split(",");

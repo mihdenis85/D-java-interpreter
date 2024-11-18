@@ -44,7 +44,6 @@ public class Interpreter<V> {
                     if (returnValue != null) {
                         break;
                     }
-
                     returnValue = parseVariableExpression(returnStatement.getExpression());
                     break;
                 case Variable variable:
@@ -62,6 +61,13 @@ public class Interpreter<V> {
                 case AssignmentStatement assignmentStatement:
                     if (assignmentStatement.getIdentifier() instanceof Identifier id) {
                         this.variables.put(id.getValue(), parseVariableExpression(assignmentStatement.getExpression()));
+                    }
+
+                    if (assignmentStatement.getIdentifier() instanceof ArrayIndex arrayIndex) {
+                        Object value = parseVariableExpression(assignmentStatement.getExpression());
+                        Object array = this.variables.get(arrayIndex.identifier.getValue());
+                        ArrayList<Object> updatedArray = setElementToArray(array, getIndex(arrayIndex.expression.getExpressions()), value);
+                        this.variables.put(arrayIndex.identifier.getValue(), updatedArray);
                     }
                     break;
                 case IfStatement ifStatement:
@@ -103,11 +109,72 @@ public class Interpreter<V> {
         return newArray.size();
     }
 
-    public Object getValueFromArray(int index, Object array) {
+    public ArrayList<Object> setElementToArray(Object array, int index, Object value) {
         String[] obj = array.toString().substring(1, array.toString().length() - 1).split(",");
+
+        for (int i = 0; i < obj.length; i++) {
+            obj[i] = obj[i].trim();
+        }
+
         ArrayList<Object> newArray = new ArrayList<>(Arrays.asList(obj));
 
+        if (index > newArray.size()) {
+            while (newArray.size() < index) {
+                newArray.add(null);
+            }
+        }
+        newArray.set(index - 1, value);
+
+        return newArray;
+    }
+
+    public String[] split(String expression) {
+        Stack<Character> stack = new Stack<>();
+        ArrayList<String> result = new ArrayList<>();
+        StringBuilder str = new StringBuilder();
+        char[] letters = expression.toCharArray();
+        for (int i = 0; i < letters.length; i++) {
+            char character = expression.charAt(i);
+            str.append(character);
+
+            if (character == '{') stack.push(character);
+            if (character == '}') stack.pop();
+
+            if ((character == ',' && stack.isEmpty()) || i == letters.length - 1) {
+                int length = str.length();
+                if (str.charAt(length - 1) == ',') {
+                    result.add(str.substring(0, length - 1).trim());
+                } else {
+                    result.add(str.toString().trim());
+                }
+                str = new StringBuilder();
+            }
+        }
+
+        return result.toArray(new String[0]);
+    }
+
+    public Object getValueFromArray(int index, Object array) {
+        String[] strings = split(array.toString().substring(1, array.toString().length() - 1));
+        ArrayList<Object> newArray = new ArrayList<>(Arrays.asList(strings));
+
         return newArray.get(index);
+    }
+
+    public int getIndex(ArrayList<ExpressionElement> elements) {
+        SHA sha = new SHA();
+        return Integer.parseInt(sha.evaluate(SHA.toRPN(interpretExpression(elements).toString())).toString(), 10);
+    }
+
+    public Map<Object, Object> getTuple(String tuple) {
+        Map<Object, Object> map = new HashMap<>();
+        String[] tupleElements = tuple.substring(1, tuple.length() - 1).split(",");
+        for (String elem : tupleElements) {
+            String[] values = elem.split("=");
+            map.put(values[0].trim(), values[1].trim());
+        }
+
+        return map;
     }
 
     public Object interpretExpression(ArrayList<ExpressionElement> elements) {
@@ -119,16 +186,45 @@ public class Interpreter<V> {
                 return parseElement(element);
             }
 
+            if (element instanceof DotNotation) {
+                return parseElement(element);
+            }
+
+            if (element instanceof TupleLiteral) {
+                this.lastVariableType = "tuple";
+                Map<Object, Object> map = new HashMap<>();
+                String tupleStr = parseElement(element);
+                String[] newTuple = tupleStr.substring(1, tupleStr.length() - 1).split(",");
+                for (String elem : newTuple) {
+                    SHA sha = new SHA();
+                    String[] values = elem.split(" := ");
+                    try {
+                        map.put(values[0].trim(), sha.evaluate(SHA.toRPN(values[1].trim())));
+                    } catch (Exception e) {
+                        map.put(map.size() + 1, sha.evaluate(SHA.toRPN(values[0].trim())));
+                    }
+                }
+
+                return map;
+            }
+
             if (element instanceof ArrayLiteral) {
                 this.lastVariableType = "array";
                 String array = parseElement(element);
                 String[] newArray = array.substring(1, array.length() - 1).split(",");
                 for (String elem : newArray) {
                     SHA sha = new SHA();
-                    result.add(sha.evaluate(SHA.toRPN(elem)).toString());
+                    Object value = sha.evaluate(SHA.toRPN(elem));
+                    result.add(value == null ? null : value.toString());
                 }
 
                 return result;
+            }
+
+            if (element instanceof StringLiteral) {
+                this.lastVariableType = "string";
+                str.append(parseElement(element));
+                continue;
             }
 
             if (element instanceof FunctionStatement) {
@@ -152,6 +248,7 @@ public class Interpreter<V> {
         }
 
         String rpn = SHA.toRPN(strExpression.toString());
+        System.out.println(rpn);
         return sha.evaluate(rpn);
     }
 
@@ -176,7 +273,17 @@ public class Interpreter<V> {
                 }
 
                 Object result = this.variables.get(id.getValue());
-                if (result.toString().charAt(0) == '[' && result.toString().charAt(result.toString().length() - 1) == ']') {
+                if (result == null) {
+                    yield id.getValue();
+                }
+
+                char start = result.toString().charAt(0);
+                char end = result.toString().charAt(result.toString().length() - 1);
+                if (start == '{' && end == '}') {
+                    this.lastVariableType = "tuple";
+                }
+
+                if (start == '[' && end == ']') {
                     this.lastVariableType = "array";
                 }
 
@@ -196,8 +303,17 @@ public class Interpreter<V> {
             case FunctionStatement functionStatement -> "func";
             case ArrayIndex ai -> {
                 String id = ai.identifier.getValue();
-                int index = Integer.parseInt(interpretExpression(ai.expression.getExpressions()).toString(), 10);
-                yield getValueFromArray(index - 1, this.variables.get(id)).toString();
+                int index = getIndex(ai.expression.getExpressions());
+                yield getValueFromArray(index - 1, this.variables.get(id)).toString().trim();
+            }
+            case TupleIndex tupleIndex -> String.valueOf(tupleIndex.getValue());
+            case DotNotation dotNotation -> {
+                String id = dotNotation.getIdentifier().getValue();
+                String attribute = parseElement(dotNotation.getAttribute());
+                String tuple = this.variables.get(id).toString();
+                Map<Object, Object> map = getTuple(tuple);
+
+                yield map.get(attribute).toString();
             }
             case IsOperator isOperator -> isOperator.value;
             case LessEqualSign lessEqualSign -> lessEqualSign.value;
@@ -221,6 +337,31 @@ public class Interpreter<V> {
                 }
                 array.append("]");
                 yield array.toString();
+            }
+            case TupleLiteral tupleLiteral -> {
+                StringBuilder tuple = new StringBuilder();
+                tuple.append("{");
+                ArrayList<TupleElement> elements = tupleLiteral.getElements();
+                for (int i = 0; i < elements.size(); i++) {
+                    String id = Objects.equals(elements.get(i).getIdentifier().getValue(), "") ? null : elements.get(i).getIdentifier().getValue();
+                    if (id == null) {
+                        tuple.append(interpretExpression(elements.get(i).getExpression().getExpressions()));
+                        if (i != elements.size() - 1) {
+                            tuple.append(",");
+                        }
+                        continue;
+                    }
+
+                    tuple.append(id);
+                    tuple.append(" := ");
+                    tuple.append(interpretExpression(elements.get(i).getExpression().getExpressions()));
+
+                    if (i != elements.size() - 1) {
+                        tuple.append(",");
+                    }
+                }
+                tuple.append("}");
+                yield tuple.toString();
             }
             case FunctionCall call -> {
                 if (call.getIdentifier() instanceof Identifier id) {
