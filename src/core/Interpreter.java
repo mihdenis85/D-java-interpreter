@@ -248,7 +248,6 @@ public class Interpreter<V> {
         }
 
         String rpn = SHA.toRPN(strExpression.toString());
-        System.out.println(rpn);
         return sha.evaluate(rpn);
     }
 
@@ -376,7 +375,7 @@ public class Interpreter<V> {
                             yield String.valueOf(value);
                         }
                         case "readString" -> {
-                            yield reader.next();
+                            yield "'" + reader.next() + "'";
                         }
                         default -> {
                             FunctionStatement func = this.functions.get(id.getValue());

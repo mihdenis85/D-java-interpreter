@@ -1,5 +1,0 @@
-var array := [64, 34, 25, 12, 22, 11, 90];
-var i;
-i := 1;
-
-print array[i] > array[i+1];
