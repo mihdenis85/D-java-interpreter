@@ -1,4 +1,4 @@
-# Project D - Dynamic language
+# IDeA: project D - Dynamic language
 ## Target platform: Interpreter
 ## Implementation language/tool: Java, hand-written parser
 
@@ -407,3 +407,9 @@ Output:
 ```
 120
 ```
+
+## Contacts:
+
+* Ilya Zubkov - i.zubkov@innopolis.university
+* Denis Mikhailov - d.mikhailov@innopolis.university
+* Anton Chulakov - a.chulakov@innopolis.university
