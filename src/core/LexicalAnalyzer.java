@@ -38,7 +38,7 @@ public class LexicalAnalyzer {
             if (!reader.ready())
                 break;
 
-            Token next = nextToken();
+            Token next = getNextToken();
             tokens.add(next);
 
             currentSpan.lineNum = next.span.lineNum;
@@ -47,7 +47,7 @@ public class LexicalAnalyzer {
         }
     }
 
-    private Token nextToken() throws IOException {
+    private Token getNextToken() throws IOException {
         char symbol = (char) reader.read();
 
         if (Character.isDigit(symbol))
@@ -59,7 +59,7 @@ public class LexicalAnalyzer {
         if (isQuotationMark(symbol))
             return expectString(symbol);
 
-        return expectPunct(symbol);
+        return expectPunctuation(symbol);
     }
 
     private boolean skipSpaces() throws IOException {
@@ -196,7 +196,7 @@ public class LexicalAnalyzer {
         return startWordAnalysis(word, span);
     }
 
-    private Token expectPunct(char firstSymbol) throws IOException {
+    private Token expectPunctuation(char firstSymbol) throws IOException {
         StringBuilder builder = new StringBuilder();
         builder.append(firstSymbol);
 
