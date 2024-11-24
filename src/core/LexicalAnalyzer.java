@@ -15,14 +15,14 @@ import java.util.ArrayList;
 public class LexicalAnalyzer {
     private final ArrayList<Token> tokens;
     private final BufferedReader reader;
-    private final Span globalSpan;
+    private final Span currentSpan;
 
     public LexicalAnalyzer(InputStream source) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(source))) {
             this.reader = reader;
-            this.globalSpan = new Span(1, 1, 0);
+            this.currentSpan = new Span(1, 1, 0);
             this.tokens = new ArrayList<>();
-            analyzeText();
+            analyze();
         }
     }
 
@@ -30,24 +30,24 @@ public class LexicalAnalyzer {
         return this.tokens;
     }
 
-    public void analyzeText() throws IOException {
+    public void analyze() throws IOException {
         while (reader.ready()) {
             //noinspection StatementWithEmptyBody
-            while (skipComments() || skipWhitespaces()) {
+            while (skipComments() || skipSpaces()) {
             }
             if (!reader.ready())
                 break;
 
-            Token next = nextToken();
+            Token next = getNextToken();
             tokens.add(next);
 
-            globalSpan.lineNum = next.span.lineNum;
-            globalSpan.posBegin = next.span.posEnd + 1;
-            globalSpan.posEnd = globalSpan.posBegin - 1;
+            currentSpan.lineNum = next.span.lineNum;
+            currentSpan.posBegin = next.span.posEnd + 1;
+            currentSpan.posEnd = currentSpan.posBegin - 1;
         }
     }
 
-    private Token nextToken() throws IOException {
+    private Token getNextToken() throws IOException {
         char symbol = (char) reader.read();
 
         if (Character.isDigit(symbol))
@@ -59,70 +59,79 @@ public class LexicalAnalyzer {
         if (isQuotationMark(symbol))
             return expectString(symbol);
 
-        return expectPunct(symbol);
+        return expectPunctuation(symbol);
     }
 
-    private boolean skipWhitespaces() throws IOException {
-        if (!reader.ready()) return false;
-
+    private boolean skipSpaces() throws IOException {
         boolean skipped = false;
-
-        do {
+        int intChar;
+        while (true) {
             reader.mark(1);
-            char symbol = (char) reader.read();
-
-            switch (symbol) {
-                case '\r' -> {
-                    globalSpan.posBegin = 1;
-                    globalSpan.posEnd = 0;
-                    skipped = true;
-                }
-                case ' ', '\t' -> {
-                    globalSpan.posBegin++;
-                    globalSpan.posEnd = globalSpan.posBegin - 1;
-                    skipped = true;
-                }
-                case '\n' -> {
-                    globalSpan.lineNum++;
-                    globalSpan.posBegin = 1;
-                    globalSpan.posEnd = 0;
-                    skipped = true;
-                }
-                default -> {
-                    reader.reset();
-                    return skipped;
-                }
+            intChar = reader.read();
+            if (intChar == -1) {
+                break;
             }
-        } while (reader.ready());
-
+            char symbol = (char) intChar;
+            if (symbol == ' ' || symbol == '\t') {
+                currentSpan.posBegin++;
+                currentSpan.posEnd = currentSpan.posBegin - 1;
+                skipped = true;
+            } else if (symbol == '\n') {
+                currentSpan.lineNum++;
+                currentSpan.posBegin = 1;
+                currentSpan.posEnd = 0;
+                skipped = true;
+            } else if (symbol == '\r') {
+                currentSpan.posBegin = 1;
+                currentSpan.posEnd = 0;
+                skipped = true;
+                reader.mark(1);
+                int nextChar = reader.read();
+                if (nextChar != -1 && (char) nextChar != '\n') {
+                    reader.reset();
+                }
+            } else {
+                reader.reset();
+                break;
+            }
+        }
         return skipped;
     }
 
     private boolean skipComments() throws IOException {
-        if (!reader.ready()) return false;
-
         boolean skipped = false;
-
-        do {
+        while (true) {
             reader.mark(2);
-            char symbol = (char) reader.read();
-            if (symbol != '/') {
+            int firstChar = reader.read();
+            if (firstChar != '/') {
                 reader.reset();
-                return skipped;
+                break;
             }
-
-            if (reader.ready() && reader.read() == '/') {
-                reader.readLine();
-                globalSpan.lineNum++;
-                globalSpan.posBegin = 1;
-                globalSpan.posEnd = 0;
-                skipped = true;
-            } else {
+            int secondChar = reader.read();
+            if (secondChar != '/') {
                 reader.reset();
-                return skipped;
+                reader.reset();
+                break;
             }
-        } while (reader.ready());
-
+            skipped = true;
+            int ch;
+            while ((ch = reader.read()) != -1 && ch != '\n' && ch != '\r') {}
+            if (ch == '\n') {
+                currentSpan.lineNum++;
+                currentSpan.posBegin = 1;
+                currentSpan.posEnd = 0;
+            } else if (ch == '\r') {
+                currentSpan.posBegin = 1;
+                currentSpan.posEnd = 0;
+                reader.mark(1);
+                int nextCh = reader.read();
+                if (nextCh == '\n') {
+                    currentSpan.lineNum++;
+                } else if (nextCh != -1) {
+                    reader.reset();
+                }
+            }
+        }
         return skipped;
     }
 
@@ -130,17 +139,23 @@ public class LexicalAnalyzer {
         StringBuilder builder = new StringBuilder();
         builder.append(firstSymbol);
 
-        boolean real = false;
+        boolean hasDecimalPoint = false;
 
-        reader.mark(2);
+        reader.mark(1);
         while (reader.ready()) {
-            char followup = (char) reader.read();
-            if (Character.isDigit(followup)) {
-                builder.append(followup);
-                reader.mark(2);
-            } else if (!real && followup == '.') {
-                builder.append(followup);
-                real = true;
+            int nextChar = reader.read();
+            if (nextChar == -1) {
+                break;
+            }
+            char ch = (char) nextChar;
+
+            if (Character.isDigit(ch)) {
+                builder.append(ch);
+                reader.mark(1);
+            } else if (!hasDecimalPoint && ch == '.') {
+                hasDecimalPoint = true;
+                builder.append(ch);
+                reader.mark(1);
             } else {
                 reader.reset();
                 break;
@@ -148,14 +163,11 @@ public class LexicalAnalyzer {
         }
 
         if (builder.charAt(builder.length() - 1) == '.') {
-            builder.deleteCharAt(builder.length() - 1);
-            real = false;
+            builder.setLength(builder.length() - 1);
         }
 
         String word = builder.toString();
-
-        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
-        span.posEnd += word.length();
+        Span span = new Span(currentSpan.lineNum, currentSpan.posBegin, currentSpan.posEnd + word.length());
 
         return startWordAnalysis(word, span);
     }
@@ -166,7 +178,11 @@ public class LexicalAnalyzer {
 
         while (reader.ready()) {
             reader.mark(1);
-            char c = (char) reader.read();
+            int nextChar = reader.read();
+            if (nextChar == -1) {
+                break;
+            }
+            char c = (char) nextChar;
             if (isIdentifier(c)) {
                 builder.append(c);
             } else {
@@ -176,29 +192,33 @@ public class LexicalAnalyzer {
         }
 
         String word = builder.toString();
-        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
-        span.posEnd += word.length();
+        Span span = new Span(currentSpan.lineNum, currentSpan.posBegin, currentSpan.posEnd + word.length());
         return startWordAnalysis(word, span);
     }
 
-    private Token expectPunct(char firstSymbol) throws IOException {
+    private Token expectPunctuation(char firstSymbol) throws IOException {
         StringBuilder builder = new StringBuilder();
         builder.append(firstSymbol);
 
         while (reader.ready()) {
             reader.mark(1);
-            char c = (char) reader.read();
+            int nextChar = reader.read();
+            if (nextChar == -1) {
+                break;
+            }
+            char c = (char) nextChar;
             builder.append(c);
-            if (isIdentifier(c) || !isPunct(builder.toString())) {
+            if (isIdentifier(c) || !isPunctuation(builder.toString())) {
                 builder.deleteCharAt(builder.length() - 1);
                 reader.reset();
                 break;
+            } else {
+                reader.mark(1);
             }
         }
 
         String word = builder.toString();
-        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
-        span.posEnd += word.length();
+        Span span = new Span(currentSpan.lineNum, currentSpan.posBegin, currentSpan.posEnd + word.length());
         return startWordAnalysis(word, span);
     }
 
@@ -207,23 +227,19 @@ public class LexicalAnalyzer {
         builder.append(firstSymbol);
 
         while (reader.ready()) {
-            reader.mark(1);
-            char c = (char) reader.read();
-            if (!isQuotationMark(c)) {
-                builder.append(c);
-            } else {
-                builder.append(c);
-                reader.mark(1);
-                //noinspection ReassignedVariable
-                c = (char) reader.read();
-                reader.reset();
+            int nextChar = reader.read();
+            if (nextChar == -1) {
+                break;
+            }
+            char c = (char) nextChar;
+            builder.append(c);
+            if (isQuotationMark(c)) {
                 break;
             }
         }
 
         String word = builder.toString();
-        Span span = new Span(globalSpan.lineNum, globalSpan.posBegin, globalSpan.posEnd);
-        span.posEnd += word.length();
+        Span span = new Span(currentSpan.lineNum, currentSpan.posBegin, currentSpan.posEnd + word.length());
         return startWordAnalysis(word, span);
     }
 
@@ -283,7 +299,7 @@ public class LexicalAnalyzer {
         return Character.isLetter(symbol) || Character.isDigit(symbol) || symbol == '_';
     }
 
-    private static boolean isPunct(String wordFromInput) {
+    private static boolean isPunctuation(String wordFromInput) {
         return switch (wordFromInput) {
             case "*", ">", "/", "+", "-", "=", "<", "<=", ">=", "/=", ":=", ",", ";", ":", "[", "]", "{", "}", "=>",
                  "(", ")" -> true;

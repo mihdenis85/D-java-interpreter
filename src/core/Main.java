@@ -1,7 +1,6 @@
 package src.core;
 
 import src.core.syntax.Program;
-import src.core.syntax.interfaces.SyntaxElement;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,9 +10,32 @@ import java.util.Comparator;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        boolean isTest = false;
+        if (isTest) {
+            test();
+        } else {
+            String source = "1.dlang";
+            InputStream inputStream = new FileInputStream(source);
+
+            LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(inputStream);
+            ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
+
+            SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
+            Program program = syntaxAnalyzer.buildProgram();
+
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
+            Program updatedProgram = semanticAnalyzer.analyze();
+
+            Interpreter interpreter = new Interpreter(updatedProgram.getProgram());
+            interpreter.interpret();
+        }
+    }
+
+    private static void test() throws IOException {
         File testDir = new File("tests/");
         File[] files = testDir.listFiles();
 
+        assert files != null;
         File[] testFiles = Arrays.stream(files)
                 .filter(file -> file.isFile() && file.getName().endsWith(".dlang"))
                 .sorted(Comparator.comparing(File::getName))
@@ -93,35 +115,8 @@ public class Main {
         }
 
         System.out.println("Passed " + passedTests + " out of " + totalTests + " tests.");
-
-//        try {
-//            String result = updatedProgram.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
-//
-//            StringBuilder stringBuilder = new StringBuilder();
-//            int tabNumber = 0;
-//            for (int i = 0; i < result.length(); i++) {
-//                char element = result.charAt(i);
-//                if (element == '}' || element == ']') {
-//                    stringBuilder.append('\n');
-//                    tabNumber--;
-//                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
-//                }
-//                stringBuilder.append(element);
-//                if (element == '{' || element == '[') {
-//                    stringBuilder.append('\n');
-//                    tabNumber++;
-//                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
-//                }
-//                if (element == ',') {
-//                    stringBuilder.append('\n');
-//                    stringBuilder.append("\t".repeat(Math.max(0, tabNumber)));
-//                }
-//            }
-//            System.out.println(stringBuilder.toString());
-//        } catch (Exception e) {
-//            System.exit(0);
-//        }
     }
+
     private static String normalizeLineEndings(String str) {
         return str.replaceAll("\\r\\n", "\n").replaceAll("\\r", "\n");
     }
