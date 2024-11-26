@@ -49,10 +49,20 @@ public class Interpreter<V> {
                 case Variable variable:
                     Identifier identifier = variable.getIdentifier();
                     this.variables.put(identifier.getValue(), parseVariableExpression(variable.getExpression()));
-                    if (this.variables.get(identifier.getValue()).equals("func")) {
+                    String variablesKey = this.variables.get(identifier.getValue()).toString();
+                    if (variablesKey.equals("func")) {
                         for (ExpressionElement el : variable.getExpression().getExpressions()) {
                             if (el instanceof FunctionStatement functionStatement) {
                                 this.functions.put(identifier.getValue(), functionStatement);
+                                this.variables.remove(identifier.getValue());
+                            }
+                        }
+                    }
+                    if (functions.containsKey(variablesKey)){
+                        FunctionStatement functionStatementValue = functions.get(variablesKey);
+                        for (ExpressionElement el : variable.getExpression().getExpressions()) {
+                            if (el instanceof FunctionCall functionCall) {
+                                this.functions.put(identifier.getValue(), functionStatementValue);
                                 this.variables.remove(identifier.getValue());
                             }
                         }
@@ -182,56 +192,52 @@ public class Interpreter<V> {
         ArrayList<String> result = new ArrayList<>();
 
         for (ExpressionElement element : elements) {
-            if (element instanceof ArrayIndex) {
-                return parseElement(element);
-            }
-
-            if (element instanceof DotNotation) {
-                return parseElement(element);
-            }
-
-            if (element instanceof TupleLiteral) {
-                this.lastVariableType = "tuple";
-                Map<Object, Object> map = new HashMap<>();
-                String tupleStr = parseElement(element);
-                String[] newTuple = tupleStr.substring(1, tupleStr.length() - 1).split(",");
-                for (String elem : newTuple) {
-                    SHA sha = new SHA();
-                    String[] values = elem.split(" := ");
-                    try {
-                        map.put(values[0].trim(), sha.evaluate(SHA.toRPN(values[1].trim())));
-                    } catch (Exception e) {
-                        map.put(map.size() + 1, sha.evaluate(SHA.toRPN(values[0].trim())));
+            switch (element) {
+                case ArrayIndex arrayIndex -> {
+                    return parseElement(arrayIndex);
+                }
+                case DotNotation dotNotation -> {
+                    return parseElement(dotNotation);
+                }
+                case TupleLiteral tupleLiteral -> {
+                    this.lastVariableType = "tuple";
+                    Map<Object, Object> map = new HashMap<>();
+                    String tupleStr = parseElement(tupleLiteral);
+                    String[] newTuple = tupleStr.substring(1, tupleStr.length() - 1).split(",");
+                    for (String elem : newTuple) {
+                        SHA sha = new SHA();
+                        String[] values = elem.split(" := ");
+                        try {
+                            map.put(values[0].trim(), sha.evaluate(SHA.toRPN(values[1].trim())));
+                        } catch (Exception e) {
+                            map.put(map.size() + 1, sha.evaluate(SHA.toRPN(values[0].trim())));
+                        }
                     }
+                    return map;
                 }
-
-                return map;
-            }
-
-            if (element instanceof ArrayLiteral) {
-                this.lastVariableType = "array";
-                String array = parseElement(element);
-                String[] newArray = array.substring(1, array.length() - 1).split(",");
-                for (String elem : newArray) {
-                    SHA sha = new SHA();
-                    Object value = sha.evaluate(SHA.toRPN(elem));
-                    result.add(value == null ? null : value.toString());
+                case ArrayLiteral arrayLiteral -> {
+                    this.lastVariableType = "array";
+                    String array = parseElement(arrayLiteral);
+                    String[] newArray = array.substring(1, array.length() - 1).split(",");
+                    for (String elem : newArray) {
+                        SHA sha = new SHA();
+                        Object value = sha.evaluate(SHA.toRPN(elem));
+                        result.add(value == null ? null : value.toString());
+                    }
+                    return result;
                 }
-
-                return result;
+                case StringLiteral stringLiteral -> {
+                    this.lastVariableType = "string";
+                    str.append(parseElement(stringLiteral));
+                }
+                case FunctionStatement functionStatement -> {
+                    this.lastVariableType = "functionStatement";
+                    str.append(parseElement(functionStatement));
+                }
+                default -> {
+                    str.append(parseElement(element));
+                }
             }
-
-            if (element instanceof StringLiteral) {
-                this.lastVariableType = "string";
-                str.append(parseElement(element));
-                continue;
-            }
-
-            if (element instanceof FunctionStatement) {
-                this.lastVariableType = "functionCall";
-            }
-
-            str.append(parseElement(element));
         }
 
         return str.toString();
@@ -244,6 +250,9 @@ public class Interpreter<V> {
         Object strExpression = interpretExpression(expression);
         if (this.lastVariableType != null) {
             this.lastVariableType = null;
+            return strExpression;
+        }
+        if (functions.containsKey(strExpression.toString())) {
             return strExpression;
         }
 
@@ -269,6 +278,12 @@ public class Interpreter<V> {
                     if (value != null) {
                         yield value.toString();
                     }
+                }
+
+                Object func = this.functions.get(id.getValue());
+                if (func != null) {
+                    this.lastVariableType = "functionStatement";
+                    yield id.getValue();
                 }
 
                 Object result = this.variables.get(id.getValue());
@@ -383,12 +398,11 @@ public class Interpreter<V> {
                             ArrayList<Identifier> ids = func.getArguments();
                             ArrayList<Expression> values = call.getArguments();
 
-
                             for (int i = 0; i < ids.size(); i++) {
                                 Object interpretedExpression = parseVariableExpression(values.get(i));
                                 func.variablesInScope.put(ids.get(i).getValue(), interpretedExpression);
                             }
-
+                            returnValue = null;
                             parseBody(func.getBody());
 
                             func.variablesInScope.clear();

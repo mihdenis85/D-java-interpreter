@@ -23,10 +23,10 @@ public class Main {
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
             Program program = syntaxAnalyzer.buildProgram();
 
-            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
-            Program updatedProgram = semanticAnalyzer.analyze();
+            //SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
+            //Program updatedProgram = semanticAnalyzer.analyze();
 
-            Interpreter interpreter = new Interpreter(updatedProgram.getProgram());
+            Interpreter interpreter = new Interpreter(program.getProgram());
             interpreter.interpret();
         }
     }
