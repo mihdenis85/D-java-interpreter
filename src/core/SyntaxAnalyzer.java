@@ -48,8 +48,8 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private boolean expectPunctuation(Code code, int ahead) throws TokenOutOfIndexException {
-        Token token = peekToken(ahead);
+    private boolean expectPunctuation(Code code) throws TokenOutOfIndexException {
+        Token token = peekToken(0);
         return Punct.contains(token.type) && code != null && code == token.type;
     }
 
@@ -516,10 +516,10 @@ public class SyntaxAnalyzer {
     private ArrayList<Expression> analyzeCallArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         ArrayList<Expression> arguments = new ArrayList<>();
 
-        if (!expectPunctuation(Code.tkClosedBracket, 0)) {
+        if (!expectPunctuation(Code.tkClosedBracket)) {
             arguments.add(parseExpression());
 
-            while (expectPunctuation(Code.tkComma, 0)) {
+            while (expectPunctuation(Code.tkComma)) {
                 skipToken();
 
                 arguments.add(parseExpression());
@@ -531,11 +531,11 @@ public class SyntaxAnalyzer {
     private ArrayList<Identifier> analyzeStatementArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         ArrayList<Identifier> arguments = new ArrayList<>();
 
-        if (!expectPunctuation(Code.tkClosedBracket, 0)) {
+        if (!expectPunctuation(Code.tkClosedBracket)) {
             Token argument = getNextToken();
             arguments.add(new Identifier(argument.value, argument.span));
 
-            while (expectPunctuation(Code.tkComma, 0)) {
+            while (expectPunctuation(Code.tkComma)) {
                 skipToken();
                 argument = getNextToken();
                 arguments.add(new Identifier(argument.value, argument.span));
