@@ -29,33 +29,6 @@ public class SyntaxAnalyzer {
         this.currentTokenIndex = 0;
     }
 
-    public Token getNextToken() {
-        if (currentTokenIndex >= tokensList.size()) {
-            return null;
-        }
-        Token token = tokensList.get(currentTokenIndex);
-        currentTokenIndex++;
-        return token;
-    }
-
-    public boolean isNextToken() {
-        return currentTokenIndex < tokensList.size();
-    }
-
-    private void skipToken() {
-        if (currentTokenIndex < tokensList.size()) {
-            currentTokenIndex++;
-        }
-    }
-
-    private Token peekToken(int ahead) throws TokenOutOfIndexException {
-        int index = currentTokenIndex + ahead;
-        if (index < tokensList.size()) {
-            return tokensList.get(index);
-        }
-        throw new TokenOutOfIndexException("Could not parse the token");
-    }
-
     private void checkPunctuation(Code code) throws UnexpectedTokenException {
         Token token = getNextToken();
         boolean isValid = code != null && Punct.contains(token.type);
@@ -203,6 +176,33 @@ public class SyntaxAnalyzer {
         }
 
         return null;
+    }
+
+    public Token getNextToken() {
+        if (currentTokenIndex >= tokensList.size()) {
+            return null;
+        }
+        Token token = tokensList.get(currentTokenIndex);
+        currentTokenIndex++;
+        return token;
+    }
+
+    public boolean isNextToken() {
+        return currentTokenIndex < tokensList.size();
+    }
+
+    private void skipToken() {
+        if (currentTokenIndex < tokensList.size()) {
+            currentTokenIndex++;
+        }
+    }
+
+    private Token peekToken(int ahead) throws TokenOutOfIndexException {
+        int index = currentTokenIndex + ahead;
+        if (index < tokensList.size()) {
+            return tokensList.get(index);
+        }
+        throw new TokenOutOfIndexException("Could not parse the token");
     }
 
     private StatementElement analyzeReturnStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
