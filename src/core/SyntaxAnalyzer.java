@@ -30,11 +30,12 @@ public class SyntaxAnalyzer {
     }
 
     public Token getNextToken() {
-        if (currentTokenIndex < tokensList.size()) {
-            return tokensList.get(currentTokenIndex++);
+        if (currentTokenIndex >= tokensList.size()) {
+            return null;
         }
-
-        return null;
+        Token token = tokensList.get(currentTokenIndex);
+        currentTokenIndex++;
+        return token;
     }
 
     public boolean isNextToken() {
@@ -42,37 +43,35 @@ public class SyntaxAnalyzer {
     }
 
     private void skipToken() {
-        currentTokenIndex++;
+        if (currentTokenIndex < tokensList.size()) {
+            currentTokenIndex++;
+        }
     }
 
     private Token peekToken(int ahead) throws TokenOutOfIndexException {
-        if (currentTokenIndex + ahead < tokensList.size())
-            return tokensList.get(currentTokenIndex + ahead);
+        int index = currentTokenIndex + ahead;
+        if (index < tokensList.size()) {
+            return tokensList.get(index);
+        }
         throw new TokenOutOfIndexException("Could not parse the token");
     }
 
     private void checkPunctuation(Code code) throws UnexpectedTokenException {
-        Token nextToken = getNextToken();
-        if (!(Punct.contains(nextToken.type) && code != null)) {
-            throw new UnexpectedTokenException(nextToken.span, nextToken.type, code);
+        Token token = getNextToken();
+        boolean isValid = code != null && Punct.contains(token.type);
+        if (!isValid) {
+            throw new UnexpectedTokenException(token.span, token.type, code);
         }
     }
 
     private void checkKeyword(Code code) {
-        Token nextToken = getNextToken();
-        if (!(Keywords.contains(nextToken.type) && code != null)) {
-            throw new InvalidSyntaxException("Expected keyword `" + code
-                    + "`, but got `" + nextToken.type + "` instead"
-                    + "\n\tat line " + nextToken.span.lineNum + " column " + nextToken.span.posBegin);
-        }
-    }
-
-    private Code checkIdentifier() throws UnexpectedTokenException {
-        Token nextToken = getNextToken();
-        if (nextToken.type == Code.tkIdentifier) {
-            return Code.tkIdentifier;
-        } else {
-            throw new UnexpectedTokenException(nextToken.span, nextToken.type, null);
+        Token token = getNextToken();
+        boolean isValid = code != null && Keywords.contains(token.type);
+        if (!isValid) {
+            String message = "Expected keyword `" + code
+                    + "`, but got `" + token.type + "` instead"
+                    + "\n\tat line " + token.span.lineNum + " column " + token.span.posBegin;
+            throw new InvalidSyntaxException(message);
         }
     }
 

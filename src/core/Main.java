@@ -10,7 +10,7 @@ import java.util.Comparator;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        boolean isTest = false;
+        boolean isTest = true;
         if (isTest) {
             test();
         } else {
