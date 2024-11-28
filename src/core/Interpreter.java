@@ -35,6 +35,10 @@ public class Interpreter<V> {
     }
 
     public void parseBody(ArrayList<StatementElement> body) {
+        parseBody(body, null);
+    }
+
+    public void parseBody(ArrayList<StatementElement> body, Map<String, Object> variablesInParentScope) {
         for (StatementElement element : body) {
             switch (element) {
                 case PrintStatement printStatement:
@@ -53,6 +57,13 @@ public class Interpreter<V> {
                     if (variablesKey.equals("func")) {
                         for (ExpressionElement el : variable.getExpression().getExpressions()) {
                             if (el instanceof FunctionStatement functionStatement) {
+                                if (variablesInParentScope != null) {
+                                    for (Map.Entry<String, Object> entry : variablesInParentScope.entrySet()) {
+                                        if (!functionStatement.variablesInScope.containsKey(entry.getKey())) {
+                                            functionStatement.variablesInScope.put(entry.getKey(), entry.getValue());
+                                        }
+                                    }
+                                }
                                 this.functions.put(identifier.getValue(), functionStatement);
                                 this.variables.remove(identifier.getValue());
                             }
@@ -403,7 +414,7 @@ public class Interpreter<V> {
                                 func.variablesInScope.put(ids.get(i).getValue(), interpretedExpression);
                             }
                             returnValue = null;
-                            parseBody(func.getBody());
+                            parseBody(func.getBody(), func.getVariablesInScope());
 
                             func.variablesInScope.clear();
                             this.functionList.removeLast();

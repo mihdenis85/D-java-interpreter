@@ -25,6 +25,7 @@ public class FunctionStatement implements ExpressionElement, StatementElement {
     public ArrayList<StatementElement> getBody() {
         return body;
     }
+    public Map<String, Object> getVariablesInScope() {return variablesInScope;}
 
     @Override
     public String toJSONString() {

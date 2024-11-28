@@ -2,7 +2,7 @@ var m := 15;
 
 var pow := func (exponent) is
   var f := func (a) is
-      return a + m;
+      return a + exponent;
   end;
   return f;
 end;
