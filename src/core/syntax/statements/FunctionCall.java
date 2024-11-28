@@ -25,8 +25,8 @@ public class FunctionCall implements ExpressionElement, StatementElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"FunctionCall\": {" + identifier.toJSONString() + "," +
+    public String serializeToJson() {
+        return "\"FunctionCall\": {" + identifier.serializeToJson() + "," +
                 "Arguments: " + JSONSerializable.serializeListToJson(arguments) + "}";
     }
 }

@@ -18,7 +18,7 @@ public class Expression implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"Expression\": " + JSONSerializable.serializeListToJson(expressions) + "\n";
     }
 }

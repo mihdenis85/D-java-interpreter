@@ -21,7 +21,7 @@ public class EmptyLiteral implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"EmptyLiteral\": {\n" + "value: " + "null" + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

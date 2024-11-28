@@ -13,7 +13,7 @@ public class BooleanType implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"BooleanType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

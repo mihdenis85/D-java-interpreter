@@ -25,7 +25,7 @@ public class PrintStatement implements StatementElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"PrintStatement\": {" + "Expressions: " + JSONSerializable.serializeListToJson(expressions) + "," +
                 "Span: " + span.toString() + "}";
     }

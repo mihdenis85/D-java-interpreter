@@ -19,7 +19,7 @@ public class NotEqualSign implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"NotEqualSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

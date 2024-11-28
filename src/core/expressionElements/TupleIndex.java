@@ -24,7 +24,7 @@ public class TupleIndex implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"TupleIndex\": {\n" + "value: " + intValue + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

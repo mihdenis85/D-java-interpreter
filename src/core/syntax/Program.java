@@ -17,7 +17,7 @@ public class Program implements JSONSerializable {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "{\"Program\": " + JSONSerializable.serializeListToJson(program) + "\n}";
     }
 }

@@ -11,7 +11,7 @@ public class Literal extends Token implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"Literal\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

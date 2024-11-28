@@ -22,7 +22,7 @@ public class TupleLiteral implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"TupleLiteral\": {" + "elements: " + JSONSerializable.serializeListToJson(elements) + "}";
     }
 }

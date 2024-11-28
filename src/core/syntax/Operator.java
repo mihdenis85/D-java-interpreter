@@ -30,9 +30,9 @@ public class Operator implements ExpressionElement, SyntaxElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"Operator\": {\n" + "Keyword: " + keyword.toJSONString() + ",\n" +
-                "Identifier: " + identifier.toJSONString() + ",\n" +
+    public String serializeToJson() {
+        return "\"Operator\": {\n" + "Keyword: " + keyword.serializeToJson() + ",\n" +
+                "Identifier: " + identifier.serializeToJson() + ",\n" +
                 "Expressions: " + JSONSerializable.serializeListToJson(expressions) + "\n}";
     }
 }

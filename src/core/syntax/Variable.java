@@ -35,10 +35,10 @@ public class Variable implements StatementElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"Variable\": {" +
-                keyword.toJSONString() + "," +
-                identifier.toJSONString() + "," +
-                expression.toJSONString() + "}";
+                keyword.serializeToJson() + "," +
+                identifier.serializeToJson() + "," +
+                expression.serializeToJson() + "}";
     }
 }

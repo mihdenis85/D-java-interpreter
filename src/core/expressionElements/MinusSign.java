@@ -23,7 +23,7 @@ public class MinusSign implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"MinusSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

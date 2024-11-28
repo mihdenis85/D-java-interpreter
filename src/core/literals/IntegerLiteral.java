@@ -17,7 +17,7 @@ public class IntegerLiteral extends Literal implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"IntegerLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

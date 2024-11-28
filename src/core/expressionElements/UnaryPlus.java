@@ -21,7 +21,7 @@ public class UnaryPlus implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"UnaryPlus\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

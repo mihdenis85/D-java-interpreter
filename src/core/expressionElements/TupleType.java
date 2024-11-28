@@ -13,7 +13,7 @@ public class TupleType implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"TupleType\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

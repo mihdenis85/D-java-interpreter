@@ -25,7 +25,7 @@ public class Identifier extends Token implements ExpressionElement, AssignmentId
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"Identifier\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

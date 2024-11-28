@@ -13,7 +13,7 @@ public class ArrayType implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"ArrayType\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

@@ -19,7 +19,7 @@ public class GreaterSign implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"GreaterSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

@@ -19,7 +19,7 @@ public class LessEqualSign implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"LessEqualSign\": {\n\t" + "value: " + value + ",\n\t" + "span: " + span.toString() + "\n}";
     }
 }

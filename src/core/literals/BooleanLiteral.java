@@ -17,7 +17,7 @@ public class BooleanLiteral extends Literal implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"BooleanLiteral\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

@@ -33,7 +33,7 @@ public class ArrayLiteral implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"ArrayLiteral\": {\n" + "elements: " + JSONSerializable.serializeListToJson(elements) + "\n}";
     }
 }

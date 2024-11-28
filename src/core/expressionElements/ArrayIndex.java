@@ -18,10 +18,10 @@ public class ArrayIndex implements AssignmentIdentifier, ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"ArrayIndex\": {" + "span: " +
                 span.toString() + "," +
-                expression.toJSONString() + "," +
-                identifier.toJSONString() + "}";
+                expression.serializeToJson() + "," +
+                identifier.serializeToJson() + "}";
     }
 }

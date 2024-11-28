@@ -29,9 +29,9 @@ public class DotNotation implements StatementElement, ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"DotNotation\": {"  + identifier.toJSONString() + ",\n" +
-                "Attribute: " + attribute.toJSONString() + ",\n" +
+    public String serializeToJson() {
+        return "\"DotNotation\": {"  + identifier.serializeToJson() + ",\n" +
+                "Attribute: " + attribute.serializeToJson() + ",\n" +
                 "Span: " + span.toString() + "\n}";
     }
 }

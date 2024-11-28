@@ -27,7 +27,7 @@ public class Main {
             Program updatedProgram = semanticAnalyzer.analyze();
 
             try {
-                String result = updatedProgram.toJSONString().replaceAll("\n", "").replaceAll("\t", "");
+                String result = updatedProgram.serializeToJson().replaceAll("\n", "").replaceAll("\t", "");
 
                 StringBuilder stringBuilder = new StringBuilder();
                 int tabNumber = 0;

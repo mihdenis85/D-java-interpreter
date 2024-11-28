@@ -22,7 +22,7 @@ public class TupleElement implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"TupleElement\": {\n" + identifier.toJSONString() + "," + expression.toJSONString() + "}";
+    public String serializeToJson() {
+        return "\"TupleElement\": {\n" + identifier.serializeToJson() + "," + expression.serializeToJson() + "}";
     }
 }

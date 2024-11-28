@@ -23,8 +23,8 @@ public class AssignmentStatement implements StatementElement, JSONSerializable {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"AssignmentStatement\": {" + identifier.toJSONString() + "," +
-                expression.toJSONString() + "}";
+    public String serializeToJson() {
+        return "\"AssignmentStatement\": {" + identifier.serializeToJson() + "," +
+                expression.serializeToJson() + "}";
     }
 }

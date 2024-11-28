@@ -23,8 +23,8 @@ public class WhileLoop implements StatementElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"WhileLoop\": {" + "Condition: " + condition.toJSONString() + "," +
+    public String serializeToJson() {
+        return "\"WhileLoop\": {" + "Condition: " + condition.serializeToJson() + "," +
                 "StatementBody: " + JSONSerializable.serializeListToJson(statementBody) + "}";
     }
 }

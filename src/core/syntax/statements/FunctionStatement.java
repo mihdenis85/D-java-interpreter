@@ -26,7 +26,7 @@ public class FunctionStatement implements ExpressionElement, StatementElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"FunctionStatement\": {" + "Arguments: " + JSONSerializable.serializeListToJson(arguments) + "," +
                 "Body: " + JSONSerializable.serializeListToJson(body) + "}";
     }

@@ -32,7 +32,7 @@ public class PlusSign implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"PlusSign\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

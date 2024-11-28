@@ -30,8 +30,8 @@ public class IfStatement implements StatementElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"IfStatement\": {" + condition.toJSONString() + "," +
+    public String serializeToJson() {
+        return "\"IfStatement\": {" + condition.serializeToJson() + "," +
                 "statementBody: " + JSONSerializable.serializeListToJson(statementBody) + "," +
                 "elseBody: " + JSONSerializable.serializeListToJson(elseStatementBody) + "}";
     }

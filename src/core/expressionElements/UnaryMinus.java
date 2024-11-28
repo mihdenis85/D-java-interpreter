@@ -21,7 +21,7 @@ public class UnaryMinus implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"UnaryMinus\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

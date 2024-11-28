@@ -23,7 +23,7 @@ public class Keyword implements ExpressionElement {
     }
 
     @Override
-    public String toJSONString() {
+    public String serializeToJson() {
         return "\"Keyword\": {\n" + "value: " + value + ",\n" + "span: " + span.toString() + "\n}";
     }
 }

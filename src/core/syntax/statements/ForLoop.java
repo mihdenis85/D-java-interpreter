@@ -28,9 +28,9 @@ public class ForLoop implements StatementElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"ForLoop\": {\n" + identifier.toJSONString() + "," +
-                array.toJSONString() + "," +
+    public String serializeToJson() {
+        return "\"ForLoop\": {\n" + identifier.serializeToJson() + "," +
+                array.serializeToJson() + "," +
                 "body: " + JSONSerializable.serializeListToJson(body) + "}";
     }
 }

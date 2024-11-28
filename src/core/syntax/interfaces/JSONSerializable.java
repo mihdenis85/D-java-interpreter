@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public interface JSONSerializable {
-    String toJSONString();
+    String serializeToJson();
 
     static String serializeListToJson(List<? extends JSONSerializable> list) {
         StringBuilder jsonBuilder = new StringBuilder();
@@ -14,7 +14,7 @@ public interface JSONSerializable {
         Iterator<? extends JSONSerializable> iterator = list.iterator();
         while (iterator.hasNext()) {
             JSONSerializable item = iterator.next();
-            jsonBuilder.append(item.toJSONString());
+            jsonBuilder.append(item.serializeToJson());
             if (iterator.hasNext()) {
                 jsonBuilder.append(",");
             }

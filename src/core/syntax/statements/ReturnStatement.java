@@ -28,8 +28,8 @@ public class ReturnStatement implements StatementElement {
     }
 
     @Override
-    public String toJSONString() {
-        return "\"ReturnStatement\": {\n" + "ReturnValue: " + returnValue.toJSONString() + ",\n" +
+    public String serializeToJson() {
+        return "\"ReturnStatement\": {\n" + "ReturnValue: " + returnValue.serializeToJson() + ",\n" +
                 "Span: " + span.toString() + "\n}";
     }
 }
