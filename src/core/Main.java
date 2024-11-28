@@ -21,7 +21,7 @@ public class Main {
             ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
 
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
-            Program program = syntaxAnalyzer.buildProgram();
+            Program program = syntaxAnalyzer.analyze();
 
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
             Program updatedProgram = semanticAnalyzer.analyze();
@@ -93,7 +93,7 @@ public class Main {
                 ArrayList<Token> tokens = lexicalAnalyzer.getTokens();
 
                 SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(tokens);
-                Program program = syntaxAnalyzer.buildProgram();
+                Program program = syntaxAnalyzer.analyze();
 
                 SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(program.getProgram());
                 Program updatedProgram = semanticAnalyzer.analyze();
