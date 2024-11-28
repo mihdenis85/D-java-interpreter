@@ -1,7 +1,5 @@
 package src.core.syntax;
 
-import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
 import src.core.syntax.interfaces.StatementElement;
 
 public class Variable implements StatementElement {

@@ -1,12 +1,11 @@
 package src.core.syntax.statements;
 
 import src.core.syntax.Expression;
-import src.core.syntax.Identifier;
 import src.core.syntax.interfaces.AssignmentIdentifier;
-import src.core.syntax.interfaces.JSONConvertable;
+import src.core.syntax.interfaces.JSONSerializable;
 import src.core.syntax.interfaces.StatementElement;
 
-public class AssignmentStatement implements StatementElement, JSONConvertable {
+public class AssignmentStatement implements StatementElement, JSONSerializable {
     private final AssignmentIdentifier identifier;
     private final Expression expression;
 

@@ -1,7 +1,7 @@
 package src.core.syntax;
 
 import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
+import src.core.syntax.interfaces.JSONSerializable;
 
 import java.util.ArrayList;
 
@@ -19,6 +19,6 @@ public class Expression implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "\"Expression\": " + JSONConvertable.listToJsonString(expressions) + "\n";
+        return "\"Expression\": " + JSONSerializable.serializeListToJson(expressions) + "\n";
     }
 }

@@ -5,7 +5,6 @@ import src.core.syntax.Expression;
 import src.core.syntax.Identifier;
 import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
 
 public class ArrayIndex implements AssignmentIdentifier, ExpressionElement {
     public final Expression expression;

@@ -1,12 +1,11 @@
 package src.core.syntax;
 
-import src.core.syntax.interfaces.JSONConvertable;
+import src.core.syntax.interfaces.JSONSerializable;
 import src.core.syntax.interfaces.StatementElement;
-import src.core.syntax.interfaces.SyntaxElement;
 
 import java.util.ArrayList;
 
-public class Program implements JSONConvertable {
+public class Program implements JSONSerializable {
     private final ArrayList<StatementElement> program;
 
     public Program(ArrayList<StatementElement> variables) {
@@ -19,6 +18,6 @@ public class Program implements JSONConvertable {
 
     @Override
     public String toJSONString() {
-        return "{\"Program\": " + JSONConvertable.listToJsonString(program) + "\n}";
+        return "{\"Program\": " + JSONSerializable.serializeListToJson(program) + "\n}";
     }
 }
