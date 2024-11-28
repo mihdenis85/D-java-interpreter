@@ -14,7 +14,6 @@ import src.core.enums.Code;
 import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;
-import src.core.syntax.interfaces.SyntaxElement;
 import src.core.syntax.statements.*;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class SyntaxAnalyzer {
         return null;
     }
 
-    public boolean hasNextToken() {
+    public boolean isNextToken() {
         return currentTokenIndex < tokensList.size();
     }
 
@@ -52,14 +51,14 @@ public class SyntaxAnalyzer {
         throw new TokenOutOfIndexException("Could not parse the token");
     }
 
-    private void matchPunct(Code code) throws UnexpectedTokenException {
+    private void checkPunctuation(Code code) throws UnexpectedTokenException {
         Token nextToken = getNextToken();
         if (!(Punct.contains(nextToken.type) && code != null)) {
             throw new UnexpectedTokenException(nextToken.span, nextToken.type, code);
         }
     }
 
-    private void matchKeyword(Code code) {
+    private void checkKeyword(Code code) {
         Token nextToken = getNextToken();
         if (!(Keywords.contains(nextToken.type) && code != null)) {
             throw new InvalidSyntaxException("Expected keyword `" + code
@@ -68,7 +67,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private Code getIdentifierOnMatch() throws UnexpectedTokenException {
+    private Code checkIdentifier() throws UnexpectedTokenException {
         Token nextToken = getNextToken();
         if (nextToken.type == Code.tkIdentifier) {
             return Code.tkIdentifier;
@@ -77,12 +76,12 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private boolean expectPunct(Code code, int ahead) throws TokenOutOfIndexException {
+    private boolean expectPunctuation(Code code, int ahead) throws TokenOutOfIndexException {
         Token token = peekToken(ahead);
         return Punct.contains(token.type) && code != null && code == token.type;
     }
 
-    public Program buildProgram() {
+    public Program analyze() {
         ArrayList<StatementElement> syntaxElements = new ArrayList<>();
 
         try {
@@ -128,22 +127,22 @@ public class SyntaxAnalyzer {
                 Expression expression = parseExpression();
                 identifier = new ArrayIndex(expression, (Identifier) identifier, token.span);
 
-                matchPunct(Code.tkClosedArrayBracket);
+                checkPunctuation(Code.tkClosedArrayBracket);
             }
             if (token.type == Code.tkOpenedBracket) {
                 skipToken();
 
-                ArrayList<Expression> arguments = parseCallArguments();
-                matchPunct(Code.tkClosedBracket);
-                matchPunct(Code.tkSemicolon);
+                ArrayList<Expression> arguments = analyzeCallArguments();
+                checkPunctuation(Code.tkClosedBracket);
+                checkPunctuation(Code.tkSemicolon);
                 return new FunctionCall(identifier, arguments);
             }
 
-            matchPunct(Code.tkAssignment);
+            checkPunctuation(Code.tkAssignment);
 
             Expression expression = parseExpression();
 
-            matchPunct(Code.tkSemicolon);
+            checkPunctuation(Code.tkSemicolon);
 
             return new AssignmentStatement(identifier, expression);
         } catch (Exception e) {
@@ -156,15 +155,15 @@ public class SyntaxAnalyzer {
 
     private ExpressionElement analyzeFunctionDeclaration() {
         try {
-            matchPunct(Code.tkOpenedBracket);
-            ArrayList<Identifier> arguments = parseStatementArguments();
+            checkPunctuation(Code.tkOpenedBracket);
+            ArrayList<Identifier> arguments = analyzeStatementArguments();
             ArrayList<StatementElement> body = new ArrayList<>();
 
-            matchPunct(Code.tkClosedBracket);
+            checkPunctuation(Code.tkClosedBracket);
             if (expectKeyword(Code.tkIs, 0)) {
-                matchKeyword(Code.tkIs);
+                checkKeyword(Code.tkIs);
                 body = parseBody();
-                matchKeyword(Code.tkEnd);
+                checkKeyword(Code.tkEnd);
             }
             if (expectKeyword(Code.tkArrowFunctionSign, 0)) {
                 body.add(analyzeArrowFuncReturnStatement());
@@ -179,7 +178,7 @@ public class SyntaxAnalyzer {
 
     private StatementElement analyzePrintStatement() {
         try {
-            matchKeyword(Code.tkPrint);
+            checkKeyword(Code.tkPrint);
 
             Expression expression = parseExpression();
 
@@ -198,7 +197,7 @@ public class SyntaxAnalyzer {
                 token = peekToken(0);
             }
 
-            matchPunct(Code.tkSemicolon);
+            checkPunctuation(Code.tkSemicolon);
             return new PrintStatement(expressions, token.span);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -210,14 +209,14 @@ public class SyntaxAnalyzer {
     private StatementElement analyzeReturnStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token token = peekToken(0);
 
-        matchKeyword(Code.tkReturn);
+        checkKeyword(Code.tkReturn);
 
         Expression returnValue = null;
-        if (hasNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
+        if (isNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
             returnValue = parseExpression();
         }
 
-        matchPunct(Code.tkSemicolon);
+        checkPunctuation(Code.tkSemicolon);
 
         return new ReturnStatement(returnValue, token.span);
     }
@@ -225,10 +224,10 @@ public class SyntaxAnalyzer {
     private StatementElement analyzeArrowFuncReturnStatement() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token token = peekToken(0);
 
-        matchPunct(Code.tkArrowFunctionSign);
+        checkPunctuation(Code.tkArrowFunctionSign);
 
         Expression returnValue = null;
-        if (hasNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
+        if (isNextToken() && !expectKeyword(Code.tkEnd, 0) && !expectKeyword(Code.tkElse, 0)) {
             returnValue = parseExpression();
         }
 
@@ -237,20 +236,20 @@ public class SyntaxAnalyzer {
 
     private StatementElement analyzeForLoopDeclaration() {
         try {
-            matchKeyword(Code.tkForLoop);
+            checkKeyword(Code.tkForLoop);
 
             Identifier ident = expectIdentifier();
 
-            matchKeyword(Code.tkIn);
+            checkKeyword(Code.tkIn);
 
             Identifier expression = expectIdentifier();
 
-            matchKeyword(Code.tkLoop);
+            checkKeyword(Code.tkLoop);
 
             ArrayList<StatementElement> loopBody = parseBody();
 
-            matchKeyword(Code.tkEnd);
-            matchPunct(Code.tkSemicolon);
+            checkKeyword(Code.tkEnd);
+            checkPunctuation(Code.tkSemicolon);
 
             return new ForLoop(ident, expression, loopBody);
         } catch (Exception e) {
@@ -263,16 +262,16 @@ public class SyntaxAnalyzer {
 
     public WhileLoop analyzeWhileLoopDeclaration() {
         try {
-            matchKeyword(Code.tkWhileLoop);
+            checkKeyword(Code.tkWhileLoop);
 
             Expression expression = parseExpression();
 
-            matchKeyword(Code.tkLoop);
+            checkKeyword(Code.tkLoop);
 
             ArrayList<StatementElement> statementBody = parseBody();
 
-            matchKeyword(Code.tkEnd);
-            matchPunct(Code.tkSemicolon);
+            checkKeyword(Code.tkEnd);
+            checkPunctuation(Code.tkSemicolon);
             return new WhileLoop(expression, statementBody);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -283,11 +282,11 @@ public class SyntaxAnalyzer {
 
     public IfStatement analyzeIfStatementDeclaration() {
         try {
-            matchKeyword(Code.tkIfStatement);
+            checkKeyword(Code.tkIfStatement);
 
             Expression expression = parseExpression();
 
-            matchKeyword(Code.tkThen);
+            checkKeyword(Code.tkThen);
 
             ArrayList<StatementElement> statementBody = parseBody();
 
@@ -297,8 +296,8 @@ public class SyntaxAnalyzer {
                 elseStatementBody = parseBody();
             }
 
-            matchKeyword(Code.tkEnd);
-            matchPunct(Code.tkSemicolon);
+            checkKeyword(Code.tkEnd);
+            checkPunctuation(Code.tkSemicolon);
 
             return new IfStatement(expression, statementBody, elseStatementBody);
         } catch (Exception e) {
@@ -319,15 +318,15 @@ public class SyntaxAnalyzer {
         ArrayList<ExpressionElement> expressions = new ArrayList<>();
 
         if (expectUnaryOperator(token)) {
-            expressions.add(parseExpressionElement());
+            expressions.add(analyzeExpressionElement());
         }
 
-        expressions.add(parseExpressionElement());
+        expressions.add(analyzeExpressionElement());
 
-        if (hasNextToken()) {
+        if (isNextToken()) {
             token = peekToken(0);
             while (!ExpressionStopper.contains(token.type)) {
-                expressions.add(parseExpressionElement());
+                expressions.add(analyzeExpressionElement());
                 token = peekToken(0);
             }
         }
@@ -335,7 +334,7 @@ public class SyntaxAnalyzer {
         return new Expression(expressions);
     }
 
-    public ArrayLiteral parseArray() throws TokenOutOfIndexException, UnexpectedTokenException {
+    public ArrayLiteral analyzeArray() throws TokenOutOfIndexException, UnexpectedTokenException {
         Token token = peekToken(0);
         ArrayLiteral array = new ArrayLiteral(new ArrayList<>(), token.span);
         while (token.type != Code.tkClosedArrayBracket) {
@@ -362,7 +361,7 @@ public class SyntaxAnalyzer {
         return array;
     }
 
-    public TupleLiteral parseTuple() throws TokenOutOfIndexException, InvalidIdentifierNameException, UnexpectedTokenException {
+    public TupleLiteral analyzeTuple() throws TokenOutOfIndexException, InvalidIdentifierNameException, UnexpectedTokenException {
         Token token = peekToken(0);
         TupleLiteral tuple = new TupleLiteral(new ArrayList<>());
 
@@ -391,7 +390,7 @@ public class SyntaxAnalyzer {
             }
 
 
-            matchPunct(Code.tkAssignment);
+            checkPunctuation(Code.tkAssignment);
 
             Expression element = parseExpression();
             TupleElement tupleElement = new TupleElement(identifier, element);
@@ -404,7 +403,7 @@ public class SyntaxAnalyzer {
         return tuple;
     }
 
-    public ExpressionElement parseExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
+    public ExpressionElement analyzeExpressionElement() throws TokenOutOfIndexException, UnexpectedTokenException {
         try {
             Token token = getNextToken();
             return switch (token.type) {
@@ -412,13 +411,13 @@ public class SyntaxAnalyzer {
                     Token prevToken = peekToken(-2);
                     if (prevToken.type == Code.tkIdentifier) {
                         Expression expression = parseExpression();
-                        matchPunct(Code.tkClosedArrayBracket);
+                        checkPunctuation(Code.tkClosedArrayBracket);
                         Identifier identifier = new Identifier(prevToken.value, prevToken.span);
                         yield new ArrayIndex(expression, identifier, token.span);
                     }
 
                     if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkComma || prevToken.type == Code.tkOpenedArrayBracket) {
-                        yield parseArray();
+                        yield analyzeArray();
                     }
 
                     yield parseExpression();
@@ -426,7 +425,7 @@ public class SyntaxAnalyzer {
                 case Code.tkOpenedTupleBracket -> {
                     Token prevToken = peekToken(-2);
                     if (prevToken.type == Code.tkAssignment || prevToken.type == Code.tkPlusSign) {
-                        yield parseTuple();
+                        yield analyzeTuple();
                     }
 
                     yield parseExpression();
@@ -437,8 +436,8 @@ public class SyntaxAnalyzer {
                     if (nextToken.type == Code.tkOpenedBracket && prevToken.type == Code.tkDot) {
                         Identifier identifier = new Identifier(token.value, token.span);
                         skipToken();
-                        ArrayList<Expression> arguments = parseCallArguments();
-                        matchPunct(Code.tkClosedBracket);
+                        ArrayList<Expression> arguments = analyzeCallArguments();
+                        checkPunctuation(Code.tkClosedBracket);
                         yield new FunctionCall(identifier, arguments);
                     }
                     yield new IntegerLiteral(token.span, token.value);
@@ -451,7 +450,7 @@ public class SyntaxAnalyzer {
                     if (nextToken.type == Code.tkDot) {
                         skipToken();
                         Identifier identifier = new Identifier(token.value, token.span);
-                        ExpressionElement attribute = parseExpressionElement();
+                        ExpressionElement attribute = analyzeExpressionElement();
                         if( attribute.getClass() ==  IntegerLiteral.class )
                             attribute = new TupleIndex(((IntegerLiteral) attribute).getValue(), ((IntegerLiteral) attribute).getSpan(), identifier);
                         yield new DotNotation(identifier, attribute, token.span);
@@ -459,8 +458,8 @@ public class SyntaxAnalyzer {
                     if (nextToken.type == Code.tkOpenedBracket) {
                         Identifier identifier = new Identifier(token.value, token.span);
                         skipToken();
-                        ArrayList<Expression> arguments = parseCallArguments();
-                        matchPunct(Code.tkClosedBracket);
+                        ArrayList<Expression> arguments = analyzeCallArguments();
+                        checkPunctuation(Code.tkClosedBracket);
                         yield new FunctionCall(identifier, arguments);
                     }
 
@@ -515,13 +514,13 @@ public class SyntaxAnalyzer {
         return null;
     }
 
-    private ArrayList<Expression> parseCallArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+    private ArrayList<Expression> analyzeCallArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         ArrayList<Expression> arguments = new ArrayList<>();
 
-        if (!expectPunct(Code.tkClosedBracket, 0)) {
+        if (!expectPunctuation(Code.tkClosedBracket, 0)) {
             arguments.add(parseExpression());
 
-            while (expectPunct(Code.tkComma, 0)) {
+            while (expectPunctuation(Code.tkComma, 0)) {
                 skipToken();
 
                 arguments.add(parseExpression());
@@ -530,14 +529,14 @@ public class SyntaxAnalyzer {
 
         return arguments;
     }
-    private ArrayList<Identifier> parseStatementArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
+    private ArrayList<Identifier> analyzeStatementArguments() throws TokenOutOfIndexException, UnexpectedTokenException {
         ArrayList<Identifier> arguments = new ArrayList<>();
 
-        if (!expectPunct(Code.tkClosedBracket, 0)) {
+        if (!expectPunctuation(Code.tkClosedBracket, 0)) {
             Token argument = getNextToken();
             arguments.add(new Identifier(argument.value, argument.span));
 
-            while (expectPunct(Code.tkComma, 0)) {
+            while (expectPunctuation(Code.tkComma, 0)) {
                 skipToken();
                 argument = getNextToken();
                 arguments.add(new Identifier(argument.value, argument.span));
@@ -569,7 +568,7 @@ public class SyntaxAnalyzer {
 
     public Variable analyzeDeclarationStatement(Token token) {
         try {
-            matchKeyword(Code.tkVar);
+            checkKeyword(Code.tkVar);
 
             Keyword keyword = new Keyword(token.value, token.span);
             Identifier identifier = expectIdentifier();
@@ -582,7 +581,7 @@ public class SyntaxAnalyzer {
                 expression = parseExpression();
             }
 
-            matchPunct(Code.tkSemicolon);
+            checkPunctuation(Code.tkSemicolon);
 
             return new Variable(keyword, identifier, expression);
         } catch (Exception e) {
