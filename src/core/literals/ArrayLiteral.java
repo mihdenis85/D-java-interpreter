@@ -1,11 +1,9 @@
 package src.core.literals;
 
-import src.core.enums.Code;
 import src.core.Span;
-import src.core.Token;
 import src.core.syntax.Expression;
 import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
+import src.core.syntax.interfaces.JSONSerializable;
 
 import java.util.ArrayList;
 
@@ -36,6 +34,6 @@ public class ArrayLiteral implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "\"ArrayLiteral\": {\n" + "elements: " + JSONConvertable.listToJsonString(elements) + "\n}";
+        return "\"ArrayLiteral\": {\n" + "elements: " + JSONSerializable.serializeListToJson(elements) + "\n}";
     }
 }

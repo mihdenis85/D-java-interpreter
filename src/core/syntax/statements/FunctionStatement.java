@@ -1,8 +1,7 @@
 package src.core.syntax.statements;
 import src.core.syntax.Identifier;
-import src.core.syntax.Variable;
 import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
+import src.core.syntax.interfaces.JSONSerializable;
 import src.core.syntax.interfaces.StatementElement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class FunctionStatement implements ExpressionElement, StatementElement {
 
     @Override
     public String toJSONString() {
-        return "\"FunctionStatement\": {" + "Arguments: " + JSONConvertable.listToJsonString(arguments) + "," +
-                "Body: " + JSONConvertable.listToJsonString(body) + "}";
+        return "\"FunctionStatement\": {" + "Arguments: " + JSONSerializable.serializeListToJson(arguments) + "," +
+                "Body: " + JSONSerializable.serializeListToJson(body) + "}";
     }
 }

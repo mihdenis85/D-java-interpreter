@@ -2,7 +2,7 @@ package src.core.literals;
 
 import src.core.expressionElements.TupleElement;
 import src.core.syntax.interfaces.ExpressionElement;
-import src.core.syntax.interfaces.JSONConvertable;
+import src.core.syntax.interfaces.JSONSerializable;
 
 import java.util.ArrayList;
 
@@ -23,6 +23,6 @@ public class TupleLiteral implements ExpressionElement {
 
     @Override
     public String toJSONString() {
-        return "\"TupleLiteral\": {" + "elements: " + JSONConvertable.listToJsonString(elements) + "}";
+        return "\"TupleLiteral\": {" + "elements: " + JSONSerializable.serializeListToJson(elements) + "}";
     }
 }
