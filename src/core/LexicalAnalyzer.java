@@ -30,9 +30,9 @@ public class LexicalAnalyzer {
         return this.tokens;
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void analyze() throws IOException {
         while (reader.ready()) {
-            //noinspection StatementWithEmptyBody
             while (skipComments() || skipSpaces()) {
             }
             if (!reader.ready())
@@ -223,6 +223,7 @@ public class LexicalAnalyzer {
         return startWordAnalysis(punctuation, span);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private Token expectString(char firstSymbol) throws IOException {
         StringBuilder builder = new StringBuilder();
         builder.append(firstSymbol);
@@ -239,7 +240,7 @@ public class LexicalAnalyzer {
             } else {
                 builder.append(ch);
                 reader.mark(1);
-                int peekChar = reader.read();
+                reader.read();
                 reader.reset();
                 stringContinues = false;
             }
