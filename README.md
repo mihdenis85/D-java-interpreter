@@ -1,6 +1,12 @@
 # IDeA: project D - Dynamic language
+## Source language: D
+## Implementation language: Java
+## Tools for creating the lexer and parser: hand-written
 ## Target platform: Interpreter
-## Implementation language/tool: Java, hand-written parser
+
+## Agenda
+* [Test cases](#test-cases)
+* [Contacts](#contacts)
 
 ## Test cases
 
@@ -406,6 +412,28 @@ Output:
 
 ```
 120
+```
+
+### 16. Return function inside the function and call it
+
+Input:
+
+```
+var pow := func (exponent) is
+  var f := func (a) is
+      return a + exponent;
+  end;
+  return f;
+end;
+
+var tmp := pow(3); // 8
+print tmp(2);
+```
+
+Output:
+
+```
+5
 ```
 
 ## Contacts:
