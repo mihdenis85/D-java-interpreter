@@ -115,9 +115,11 @@ public class SemanticAnalyzer {
 
             if (expression.getExpressions().getFirst() instanceof FunctionCall functionCall) {
                 if (functionCall.getIdentifier() instanceof Identifier id) {
-                    if (!Objects.equals(id.getValue(), "readInt") && !Objects.equals(id.getValue(), "readString") && !Objects.equals(id.getValue(), "readReal")) {
-                        if (!definedVariables.containsKey(id.getValue()) && !(currentExpression instanceof TupleLiteral)) {
-                            throw new UndefinedFunctionException(id.getValue(), id.getSpan());
+                    boolean isFunctionDefined = isFunctionDefined(id);
+                    if (isFunctionDefined) {
+                        Integer returnedFunctionArgs = definedVariables.get(id.getValue());
+                        if (returnedFunctionArgs != null && returnedFunctionArgs > 0) {
+                            definedVariables.put(identifier, returnedFunctionArgs);
                         }
                     }
                 }
@@ -271,6 +273,19 @@ public class SemanticAnalyzer {
 
             analyzeExpression(expression.getExpressions());
         }
+    }
+
+    private boolean isFunctionDefined(Identifier id) {
+        boolean isStandardReadFunction = id.getValue().equals("readInt")
+                || id.getValue().equals("readString")
+                || id.getValue().equals("readReal");
+        boolean isTupleLiteral = currentExpression instanceof TupleLiteral;
+        boolean isFunctionDefined = definedVariables.containsKey(id.getValue());
+
+        if (!isStandardReadFunction && !isFunctionDefined && !isTupleLiteral) {
+            throw new UndefinedFunctionException(id.getValue(), id.getSpan());
+        }
+        return isFunctionDefined;
     }
 
     public void analyzeExpression(ArrayList<ExpressionElement> expressions) {
