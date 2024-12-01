@@ -1,8 +1,6 @@
 package src.core.expressionElements;
 
-import src.core.Span;
-import src.core.literals.IntegerLiteral;
-import src.core.literals.RealLiteral;
+import src.core.token.Span;
 import src.core.syntax.interfaces.ExpressionElement;
 
 public class LessSign implements ExpressionElement {

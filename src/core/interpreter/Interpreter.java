@@ -1,6 +1,6 @@
-package src.core;
+package src.core.interpreter;
 
-import org.w3c.dom.ls.LSOutput;
+import src.core.utils.SHA;
 import src.core.expressionElements.*;
 import src.core.literals.*;
 import src.core.syntax.Expression;

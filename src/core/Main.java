@@ -1,6 +1,11 @@
 package src.core;
 
+import src.core.interpreter.Interpreter;
+import src.core.analyzers.LexicalAnalyzer;
+import src.core.analyzers.SemanticAnalyzer;
+import src.core.analyzers.SyntaxAnalyzer;
 import src.core.syntax.Program;
+import src.core.token.Token;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,7 +15,7 @@ import java.util.Comparator;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        boolean isTest = false;
+        boolean isTest = true;
         if (isTest) {
             test();
         } else {

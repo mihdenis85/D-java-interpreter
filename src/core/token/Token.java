@@ -1,4 +1,4 @@
-package src.core;
+package src.core.token;
 
 import src.core.enums.Code;
 

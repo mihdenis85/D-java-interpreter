@@ -1,5 +1,7 @@
-package src.core;
+package src.core.analyzers;
 
+import src.core.token.Span;
+import src.core.token.Token;
 import src.core.enums.Code;
 import src.core.literals.BooleanLiteral;
 import src.core.literals.IntegerLiteral;

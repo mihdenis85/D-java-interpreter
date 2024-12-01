@@ -1,6 +1,6 @@
 package src.core.exceptions;
 
-import src.core.Span;
+import src.core.token.Span;
 import src.core.enums.Code;
 
 public class UnexpectedTokenException extends Exception {

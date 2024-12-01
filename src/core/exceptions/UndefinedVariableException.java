@@ -1,6 +1,6 @@
 package src.core.exceptions;
 
-import src.core.Span;
+import src.core.token.Span;
 
 public class UndefinedVariableException extends RuntimeException {
     public UndefinedVariableException(String variableName, Span span) {

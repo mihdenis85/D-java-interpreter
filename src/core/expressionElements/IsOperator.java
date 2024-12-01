@@ -1,10 +1,6 @@
 package src.core.expressionElements;
 
-import src.core.Span;
-import src.core.literals.BooleanLiteral;
-import src.core.literals.IntegerLiteral;
-import src.core.literals.RealLiteral;
-import src.core.literals.StringLiteral;
+import src.core.token.Span;
 import src.core.syntax.interfaces.ExpressionElement;
 
 import java.util.Objects;

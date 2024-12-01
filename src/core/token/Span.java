@@ -1,4 +1,4 @@
-package src.core;
+package src.core.token;
 
 public class Span {
     public long lineNum;

@@ -1,6 +1,6 @@
 package src.core.expressionElements;
 
-import src.core.Span;
+import src.core.token.Span;
 import src.core.syntax.interfaces.ExpressionElement;
 
 public class RealType implements ExpressionElement {

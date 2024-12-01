@@ -1,7 +1,7 @@
 package src.core.syntax;
 
-import src.core.Span;
-import src.core.Token;
+import src.core.token.Span;
+import src.core.token.Token;
 import src.core.enums.Code;
 import src.core.syntax.interfaces.AssignmentIdentifier;
 import src.core.syntax.interfaces.ExpressionElement;

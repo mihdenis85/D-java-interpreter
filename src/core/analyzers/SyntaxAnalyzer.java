@@ -1,5 +1,6 @@
-package src.core;
+package src.core.analyzers;
 
+import src.core.token.Token;
 import src.core.enums.ExpressionStopper;
 import src.core.enums.Keywords;
 import src.core.enums.Punct;

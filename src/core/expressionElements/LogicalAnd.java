@@ -1,7 +1,6 @@
 package src.core.expressionElements;
 
-import src.core.Span;
-import src.core.literals.BooleanLiteral;
+import src.core.token.Span;
 import src.core.syntax.interfaces.ExpressionElement;
 
 public class LogicalAnd implements ExpressionElement {

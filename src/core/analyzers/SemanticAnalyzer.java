@@ -1,4 +1,4 @@
-package src.core;
+package src.core.analyzers;
 
 import src.core.exceptions.InvalidArgumentsCountException;
 import src.core.exceptions.UndefinedFunctionException;

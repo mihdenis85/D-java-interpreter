@@ -1,6 +1,6 @@
 package src.core.syntax.statements;
 
-import src.core.Span;
+import src.core.token.Span;
 import src.core.syntax.Identifier;
 import src.core.syntax.interfaces.ExpressionElement;
 import src.core.syntax.interfaces.StatementElement;

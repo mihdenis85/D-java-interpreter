@@ -1,6 +1,6 @@
 package src.core.literals;
 
-import src.core.Span;
+import src.core.token.Span;
 import src.core.syntax.interfaces.ExpressionElement;
 
 public class EmptyLiteral implements ExpressionElement {
